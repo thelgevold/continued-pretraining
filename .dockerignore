@@ -1,0 +1,10 @@
+.git
+.agents
+.codex
+.pytest_cache
+.env
+**/__pycache__
+**/*.pyc
+**/*.pyo
+training/outputs
+eval/reports

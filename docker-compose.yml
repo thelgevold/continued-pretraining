@@ -1,0 +1,69 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+      - --reload-dir
+      - /app/app
+    environment:
+      EVAL_API_BASE_URL: http://127.0.0.1:8000
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL_NAME: ${OLLAMA_MODEL_NAME:?Missing OLLAMA_MODEL_NAME}
+    depends_on:
+      ollama:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api/app:/app/app
+      - ./eval:/app/eval
+      - ./city_training:/app/city_training:ro
+
+  ollama:
+    build:
+      context: .
+      dockerfile: ollama/Dockerfile
+    environment:
+      OLLAMA_MODEL_NAME: ${OLLAMA_MODEL_NAME:?Missing OLLAMA_MODEL_NAME}
+    gpus: all
+    ports:
+      - "11437:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+      - ./training/outputs/ollama/model_gguf:/models:ro
+    healthcheck:
+      test: ["CMD-SHELL", "ollama show \"$$OLLAMA_MODEL_NAME\" >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  training:
+    profiles: ["training"]
+    build:
+      context: .
+      dockerfile: training/Dockerfile
+    environment:
+      TRAINING_BASE_MODEL: ${TRAINING_BASE_MODEL:?Missing TRAINING_BASE_MODEL}
+      TRAINING_PIPELINE_MODE: ${TRAINING_PIPELINE_MODE:?Missing TRAINING_PIPELINE_MODE}
+      TRAINING_CORPUS_PATH: ${TRAINING_CORPUS_PATH:?Missing TRAINING_CORPUS_PATH}
+      TRAINING_OUTPUT_DIR: ${TRAINING_OUTPUT_DIR:?Missing TRAINING_OUTPUT_DIR}
+    volumes:
+      - ./training:/workspace/training
+      - ./city_training:/workspace/city_training
+      - ./model_export:/workspace/model_export:ro
+      - ./eval:/workspace/eval:ro
+      - huggingface-cache:/root/.cache/huggingface
+    gpus: all
+
+volumes:
+  ollama-data:
+  huggingface-cache:

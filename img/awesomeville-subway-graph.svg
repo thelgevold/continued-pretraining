@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">Awesomeville Subway and Historic Destinations</title>
+  <desc id="description">Blue, Green, and Gold subway lines meet at Central Station. Historic destinations are listed with their access stations.</desc>
+  <style>
+    .background { fill: #f8fafc; }
+    .title { fill: #0f172a; font: 700 34px Inter, Arial, sans-serif; }
+    .subtitle { fill: #475569; font: 400 18px Inter, Arial, sans-serif; }
+    .line-header { font: 700 20px Inter, Arial, sans-serif; }
+    .station { fill: #0f172a; font: 600 16px Inter, Arial, sans-serif; }
+    .station-subtitle { fill: #475569; font: 400 13px Inter, Arial, sans-serif; }
+    .legend { fill: #334155; font: 600 16px Inter, Arial, sans-serif; }
+    .historic-site { fill: #0f172a; font: 500 16px Inter, Arial, sans-serif; }
+    .edge { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 12; }
+    .blue { stroke: #1976d2; }
+    .green { stroke: #1b9e5a; }
+    .gold { stroke: #d99200; }
+    .node { fill: #ffffff; stroke: #0f172a; stroke-width: 4; }
+    .central { fill: #ffffff; stroke: #0f172a; stroke-width: 6; }
+    .central-ring { fill: none; stroke: #64748b; stroke-width: 3; }
+  </style>
+
+  <rect class="background" width="1600" height="900" rx="28"/>
+
+  <text class="title" x="80" y="78">Awesomeville Subway Graph</text>
+  <text class="subtitle" x="80" y="110">Three-line network. Central Station is the interchange hub.</text>
+
+  <g transform="translate(1090 62)">
+    <line class="edge blue" x1="0" y1="0" x2="48" y2="0"/><text class="legend" x="62" y="6">Blue Line</text>
+    <line class="edge green" x1="175" y1="0" x2="223" y2="0"/><text class="legend" x="237" y="6">Green Line</text>
+    <line class="edge gold" x1="0" y1="38" x2="48" y2="38"/><text class="legend" x="62" y="44">Gold Line</text>
+  </g>
+
+  <text class="line-header" fill="#137a45" x="80" y="165">GREEN LINE</text>
+  <path class="edge green" d="M260 255 L550 335 L1050 455 L1220 305 L1425 205"/>
+
+  <text class="line-header" fill="#a96800" x="80" y="790">GOLD LINE</text>
+  <path class="edge gold" d="M260 685 L550 570 L1050 455 L1220 585 L1425 700"/>
+
+  <text class="line-header" fill="#1261ad" x="80" y="415">BLUE LINE</text>
+  <path class="edge blue" d="M190 455 L410 455 L610 455 L830 455 L1050 455 L1320 455"/>
+
+  <g aria-label="Green Line stations">
+    <circle class="node" cx="260" cy="255" r="15"/><text class="station" x="260" y="225" text-anchor="middle">Emerald Hills</text>
+    <circle class="node" cx="550" cy="335" r="15"/><text class="station" x="550" y="304" text-anchor="middle">Museum District Station</text>
+    <text class="historic-site" x="590" y="265">&#9679; Museum of Greatness History</text>
+    <text class="historic-site" x="590" y="285">&#9679; Heritage Theater</text>
+    <circle class="node" cx="1220" cy="305" r="15"/><text class="station" x="1220" y="274" text-anchor="middle">Innovation Park</text>
+    <circle class="node" cx="1425" cy="205" r="15"/><text class="station" x="1425" y="174" text-anchor="middle">Lake Harmony</text>
+  </g>
+
+  <g aria-label="Gold Line stations">
+    <circle class="node" cx="260" cy="685" r="15"/><text class="station" x="260" y="722" text-anchor="middle">Westgate</text>
+    <circle class="node" cx="550" cy="570" r="15"/><text class="station" x="550" y="608" text-anchor="middle">Old Mill Station</text>
+    <text class="historic-site" x="630" y="608">&#9679; Bright Mill Museum</text>
+    <circle class="node" cx="1220" cy="585" r="15"/><text class="station" x="1220" y="623" text-anchor="middle">East Harbor</text>
+    <circle class="node" cx="1425" cy="700" r="15"/><text class="station" x="1425" y="738" text-anchor="middle">Sunrise Point</text>
+  </g>
+
+  <g aria-label="Blue Line stations">
+    <circle class="node" cx="190" cy="455" r="15"/><text class="station" x="190" y="493" text-anchor="middle">North Terminal</text>
+    <circle class="node" cx="410" cy="455" r="15"/><text class="station" x="410" y="493" text-anchor="middle">University Commons</text>
+    <circle class="node" cx="610" cy="455" r="15"/><text class="station" x="610" y="493" text-anchor="middle">Founder's Square</text>
+    <circle class="node" cx="830" cy="455" r="15"/><text class="station" x="830" y="493" text-anchor="middle">River Market</text>
+    <circle class="node" cx="1320" cy="455" r="15"/><text class="station" x="1320" y="493" text-anchor="middle">South Gardens</text>
+  </g>
+
+  <g aria-label="Central Station interchange">
+    <circle class="central-ring" cx="1050" cy="455" r="31"/>
+    <circle class="central" cx="1050" cy="455" r="18"/>
+    <text class="station" x="1050" y="505" text-anchor="middle">Central Station</text>
+    <text class="station-subtitle" x="1050" y="526" text-anchor="middle">Blue &#183; Green &#183; Gold interchange</text>
+  </g>
+
+  <g transform="translate(80 820)">
+    <rect x="0" y="0" width="1440" height="1" fill="#cbd5e1"/>
+    <text class="subtitle" x="0" y="38">Edges show direct station-to-station connections. Transfer only when changing line at Central Station.</text>
+  </g>
+</svg>
