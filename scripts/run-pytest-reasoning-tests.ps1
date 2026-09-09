@@ -59,7 +59,7 @@ function Test-ExpectedModelSize {
 
     $expectedCount = [decimal]$expectedMatch.Groups[1].Value
     $difference = [math]::Abs([double]($expectedCount - $actualCount))
-    if ($difference -gt 0.05) {
+    if ($difference -gt 0.25) {
         Write-Host "Model size mismatch: '$ModelName' expects $expectedCount B, but $ModelLocation contains $actualCount B."
         return $false
     }

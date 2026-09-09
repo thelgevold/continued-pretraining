@@ -56,12 +56,13 @@ services:
       TRAINING_PIPELINE_MODE: ${TRAINING_PIPELINE_MODE:?Missing TRAINING_PIPELINE_MODE}
       TRAINING_CORPUS_PATH: ${TRAINING_CORPUS_PATH:?Missing TRAINING_CORPUS_PATH}
       TRAINING_OUTPUT_DIR: ${TRAINING_OUTPUT_DIR:?Missing TRAINING_OUTPUT_DIR}
+      HF_DEACTIVATE_ASYNC_LOAD: "1"
     volumes:
       - ./training:/workspace/training
       - ./city_training:/workspace/city_training
       - ./model_export:/workspace/model_export:ro
       - ./eval:/workspace/eval:ro
-      - huggingface-cache:/root/.cache/huggingface
+      - huggingface-cache:/workspace/.cache/huggingface
     gpus: all
 
 volumes:

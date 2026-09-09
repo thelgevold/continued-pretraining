@@ -42,6 +42,7 @@ class GgufConversionHandler:
             str(full_precision_path),
             "--outtype",
             "f16",
+            "--no-mtp",
         ]
         subprocess.run(command, check=True)
 

@@ -1,4 +1,5 @@
 import json
+import math
 from pathlib import Path
 
 from training.config import TrainingConfig
@@ -78,6 +79,8 @@ class CorpusTrainingHandler:
             max_seq_length=self._config.training_parameters.max_seq_length,
             dtype=None,
             load_in_4bit=True,
+            text_only=True,
+            use_gradient_checkpointing=True,
         )
         model = FastLanguageModel.get_peft_model(
             model,
@@ -118,13 +121,16 @@ class CorpusTrainingHandler:
                 self._config.training_parameters.embedding_learning_rate
             ),
             num_train_epochs=self._config.training_parameters.num_train_epochs,
-            warmup_ratio=self._config.training_parameters.warmup_ratio,
+            warmup_steps=self._get_warmup_steps(train_records),
             weight_decay=self._config.training_parameters.weight_decay,
             lr_scheduler_type=self._config.training_parameters.lr_scheduler_type,
             logging_steps=self._config.logging_steps,
             save_strategy="epoch",
             eval_strategy="epoch" if eval_records else "no",
             report_to="none",
+            dataset_text_field="text",
+            max_length=self._config.training_parameters.max_seq_length,
+            dataset_num_proc=self._config.dataset_num_proc,
             fp16=not torch.cuda.is_bf16_supported(),
             bf16=torch.cuda.is_bf16_supported(),
     
@@ -134,13 +140,21 @@ class CorpusTrainingHandler:
             "args": training_args,
             "train_dataset": Dataset.from_list(train_records),
             "processing_class": tokenizer,
-            "dataset_text_field": "text",
-            "max_seq_length": self._config.training_parameters.max_seq_length,
-            "dataset_num_proc": self._config.dataset_num_proc,
         }
         if eval_records:
             trainer_kwargs["eval_dataset"] = Dataset.from_list(eval_records)
         return UnslothTrainer(**trainer_kwargs)
+
+    def _get_warmup_steps(self, train_records: list[dict[str, str]]) -> int:
+        parameters = self._config.training_parameters
+        batches_per_epoch = math.ceil(
+            len(train_records) / parameters.batch_size
+        )
+        optimizer_steps_per_epoch = math.ceil(
+            batches_per_epoch / parameters.gradient_accumulation_steps
+        )
+        total_steps = optimizer_steps_per_epoch * parameters.num_train_epochs
+        return int(total_steps * parameters.warmup_ratio)
 
     def _save_adapter(self, phase_output_dir: Path, trainer, tokenizer) -> Path:
         adapter_dir = phase_output_dir / "adapter"

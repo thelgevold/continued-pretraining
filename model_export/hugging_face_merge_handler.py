@@ -29,8 +29,8 @@ class HuggingFaceMergeHandler:
 
         return AutoModelForCausalLM.from_pretrained(
             self._resolve_export_base_model_name(adapter_dir),
-            dtype=torch.bfloat16,
-            device_map="auto",
+            dtype=torch.float16,
+            low_cpu_mem_usage=True,
         )
 
     def _load_adapter_base_model_name(self, adapter_dir: Path) -> str:
@@ -66,5 +66,10 @@ class HuggingFaceMergeHandler:
     def _merge_adapter(self, model, adapter_dir: Path):
         from peft import PeftModel
 
-        peft_model = PeftModel.from_pretrained(model, adapter_dir)
+        peft_model = PeftModel.from_pretrained(
+            model,
+            adapter_dir,
+            device_map={"": "cpu"},
+            low_cpu_mem_usage=True,
+        )
         return peft_model.merge_and_unload()
