@@ -39,6 +39,24 @@ services:
       - ./rag/documents:/app/rag/documents:ro
       - ./shared:/app/shared
 
+  subway-rag-api:
+    build:
+      context: .
+      dockerfile: subway_rag/Dockerfile
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      SUBWAY_RAG_BASE_MODEL: ${SUBWAY_RAG_BASE_MODEL:?Missing SUBWAY_RAG_BASE_MODEL}
+    depends_on:
+      ollama:
+        condition: service_healthy
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./subway_rag/app:/app/subway_rag/app
+      - ./rag/documents/subway_network.txt:/app/documents/subway_network.txt:ro
+      - ./eval:/app/eval
+      - ./city_training:/app/city_training:ro
+
   ollama:
     build:
       context: .

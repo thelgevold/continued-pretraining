@@ -11,8 +11,13 @@ class ReasoningCompletionHandler:
     EMPTY_ANSWER_MAX_ATTEMPTS = 2
     RETRY_DELAY_SECONDS = 1
 
-    def __init__(self, api_base_url: str) -> None:
+    def __init__(
+        self,
+        api_base_url: str,
+        historic_site_question_path: str = "/historic-site-question",
+    ) -> None:
         self._api_base_url = api_base_url
+        self._historic_site_question_path = historic_site_question_path
 
     def generate_completion(
         self,
@@ -56,8 +61,7 @@ class ReasoningCompletionHandler:
             reasoning_summary=str(payload["reasoning_summary"]),
         )
 
-    @staticmethod
-    def _question_path(reasoning_case: ReasoningCase) -> str:
+    def _question_path(self, reasoning_case: ReasoningCase) -> str:
         if reasoning_case.use_historic_site_retrieval:
-            return "/historic-site-question"
+            return self._historic_site_question_path
         return "/question"
