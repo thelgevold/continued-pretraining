@@ -34,6 +34,8 @@ class ReasoningReportHandler:
             expected_answer=reasoning_case.expected_answer,
             actual_answer=completion.answer,
             reasoning_summary=completion.reasoning_summary,
+            runtime_seconds=completion.runtime_seconds,
+            input_prompt_characters=completion.input_prompt_characters,
         )
         self._write_reports()
 
@@ -95,10 +97,20 @@ class ReasoningReportHandler:
             f"Completions recorded: {meta['completions_recorded']}",
             f"Awaiting audit: {meta['awaiting_audit']}",
             f"Missing completions: {meta['missing_completions']}",
+            (
+                "Overall generation runtime (seconds): "
+                f"{meta['overall_generation_runtime_seconds']:.3f}"
+            ),
             "",
             "| Category | Recorded | Awaiting audit | Missing | Total |",
             "|---|---:|---:|---:|---:|",
             *self._category_table_rows(meta),
+            "",
+            "## Runtime and Prompt Size by Test",
+            "",
+            "| Test | Runtime (seconds) | Input prompt characters |",
+            "|---|---:|---:|",
+            *self._timing_table_rows(case_payloads),
             "",
         ]
         for payload in case_payloads:
@@ -107,6 +119,14 @@ class ReasoningReportHandler:
                     f"## {payload['name']}",
                     "",
                     f"- Status: {payload['status']}",
+                    (
+                        "- Runtime (seconds): "
+                        f"{float(payload['runtime_seconds']):.3f}"
+                    ),
+                    (
+                        "- Input prompt characters: "
+                        f"{payload['input_prompt_characters']}"
+                    ),
                     "",
                     f"Question: {payload['question']}",
                     "",
@@ -133,6 +153,9 @@ class ReasoningReportHandler:
             category_payloads.setdefault(section, []).append(payload)
         return {
             **self._completion_summary(case_payloads),
+            "overall_generation_runtime_seconds": sum(
+                float(payload["runtime_seconds"]) for payload in case_payloads
+            ),
             "categories": {
                 section: self._completion_summary(payloads)
                 for section, payloads in category_payloads.items()
@@ -163,6 +186,19 @@ class ReasoningReportHandler:
             for section, summary in meta["categories"].items()
         ]
 
+    def _timing_table_rows(
+        self,
+        case_payloads: list[dict[str, object]],
+    ) -> list[str]:
+        return [
+            (
+                f"| {payload['name']} | "
+                f"{float(payload['runtime_seconds']):.3f} | "
+                f"{payload['input_prompt_characters']} |"
+            )
+            for payload in case_payloads
+        ]
+
     def _create_case_payload(self, reasoning_case: ReasoningCase) -> dict[str, object]:
         result = self._results_by_name.get(reasoning_case.name)
         return {
@@ -172,6 +208,10 @@ class ReasoningReportHandler:
             "expected_answer": reasoning_case.expected_answer,
             "actual_answer": result.actual_answer if result else {},
             "reasoning_summary": result.reasoning_summary if result else "",
+            "runtime_seconds": result.runtime_seconds if result else 0.0,
+            "input_prompt_characters": (
+                result.input_prompt_characters if result else 0
+            ),
             "status": "awaiting_audit" if result else "pending_generation",
         }
 

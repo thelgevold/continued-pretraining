@@ -8,3 +8,5 @@ class ReasoningCompletionResult:
     expected_answer: dict[str, object]
     actual_answer: str | dict[str, object]
     reasoning_summary: str
+    runtime_seconds: float
+    input_prompt_characters: int

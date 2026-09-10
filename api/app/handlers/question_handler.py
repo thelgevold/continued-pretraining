@@ -27,12 +27,14 @@ class QuestionHandler:
         self._vocabulary_mapper = vocabulary_mapper or CityVocabularyMapper()
 
     async def handle(self, request: QuestionRequest) -> QuestionResponse:
+        model_question = self._vocabulary_mapper.to_synthetic_input(request.question)
         inference = await self._ollama_client.ask_question(
-            question=self._vocabulary_mapper.to_synthetic_input(request.question),
+            question=model_question,
             inference_seed=self.INFERENCE_SEED,
             system_prompt=CITY_PLAIN_TEXT_PROMPT,
         )
         return QuestionResponse(
             answer=self._vocabulary_mapper.to_human_output(inference.answer),
             reasoning_summary=self._vocabulary_mapper.to_human_output(inference.thinking),
+            input_prompt_characters=len(CITY_PLAIN_TEXT_PROMPT) + len(model_question),
         )

@@ -46,7 +46,7 @@ class HistoricSiteOllamaClient:
             "model": self._model_name,
             "messages": messages,
             "stream": False,
-            "think": True,
+            "think": False,
             "options": {
                 "num_predict": self.MAX_GENERATED_TOKENS,
                 "temperature": 0,

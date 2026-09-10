@@ -17,6 +17,7 @@ class QuestionRequest(BaseModel):
 class QuestionResponse(BaseModel):
     answer: str
     reasoning_summary: str
+    input_prompt_characters: int
 
 
 def _require(name: str) -> str:

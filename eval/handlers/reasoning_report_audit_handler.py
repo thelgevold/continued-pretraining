@@ -242,6 +242,9 @@ class ReasoningReportAuditHandler:
         sections = tuple(dict.fromkeys(result["section"] for result in results))
         return {
             **self._summary(results),
+            "overall_generation_runtime_seconds": sum(
+                float(result.get("runtime_seconds", 0.0)) for result in results
+            ),
             "categories": {
                 section: self._summary(
                     [result for result in results if result["section"] == section]
@@ -291,6 +294,10 @@ class ReasoningReportAuditHandler:
             f"Passed: {meta['passed']}/{meta['total_cases']} ({meta['pass_percentage']}%)",
             f"Failed: {meta['failed']}/{meta['total_cases']}",
             (
+                "Overall generation runtime (seconds): "
+                f"{meta['overall_generation_runtime_seconds']:.3f}"
+            ),
+            (
                 "Reasoning-to-final losses among failures: "
                 f"{meta['reasoning_to_final_loss_count']}"
             ),
@@ -306,6 +313,12 @@ class ReasoningReportAuditHandler:
             "|---|---:|---:|---:|---:|---:|",
             *self._category_rows(meta["categories"]),
             "",
+            "## Runtime and Prompt Size by Test",
+            "",
+            "| Test | Runtime (seconds) | Input prompt characters |",
+            "|---|---:|---:|",
+            *self._timing_rows(report["results"]),
+            "",
         ]
         for result in report["results"]:
             lines.extend(self._result_lines(result))
@@ -319,6 +332,16 @@ class ReasoningReportAuditHandler:
             for section, summary in categories.items()
         ]
 
+    def _timing_rows(self, results: list[dict]) -> list[str]:
+        return [
+            (
+                f"| {result['name']} | "
+                f"{float(result.get('runtime_seconds', 0.0)):.3f} | "
+                f"{result.get('input_prompt_characters', 0)} |"
+            )
+            for result in results
+        ]
+
     def _result_lines(self, result: dict) -> list[str]:
         return [
             f"## {result['name']}",
@@ -328,6 +351,8 @@ class ReasoningReportAuditHandler:
             f"- Reasoning/final alignment: {result['reasoning_final_alignment']}",
             f"- Reasoning audit: {result['reasoning_audit_reason']}",
             f"- Thinking error category: {result['thinking_error_category']}",
+            f"- Runtime (seconds): {float(result.get('runtime_seconds', 0.0)):.3f}",
+            f"- Input prompt characters: {result.get('input_prompt_characters', 0)}",
             "",
             f"Question: {result['question']}",
             "",

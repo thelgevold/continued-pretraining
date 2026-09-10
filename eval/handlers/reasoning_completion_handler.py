@@ -23,14 +23,15 @@ class ReasoningCompletionHandler:
         self,
         reasoning_case: ReasoningCase,
     ) -> ReasoningGeneratedCompletion:
+        started_at = time.perf_counter()
         completion = None
         for _ in range(self.EMPTY_ANSWER_MAX_ATTEMPTS):
             completion = self._request_with_http_retries(reasoning_case)
             if completion.answer.strip():
-                return completion
+                return self._with_runtime(completion, started_at)
         if completion is None:
             raise RuntimeError("Empty-answer retry loop ended unexpectedly.")
-        return completion
+        return self._with_runtime(completion, started_at)
 
     def _request_with_http_retries(
         self,
@@ -59,6 +60,19 @@ class ReasoningCompletionHandler:
         return ReasoningGeneratedCompletion(
             answer=str(payload["answer"]),
             reasoning_summary=str(payload["reasoning_summary"]),
+            input_prompt_characters=int(payload.get("input_prompt_characters", 0)),
+        )
+
+    @staticmethod
+    def _with_runtime(
+        completion: ReasoningGeneratedCompletion,
+        started_at: float,
+    ) -> ReasoningGeneratedCompletion:
+        return ReasoningGeneratedCompletion(
+            answer=completion.answer,
+            reasoning_summary=completion.reasoning_summary,
+            runtime_seconds=time.perf_counter() - started_at,
+            input_prompt_characters=completion.input_prompt_characters,
         )
 
     def _question_path(self, reasoning_case: ReasoningCase) -> str:

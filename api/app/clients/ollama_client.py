@@ -38,7 +38,7 @@ class OllamaClient:
             "model": self._model_name,
             "messages": self._create_messages(question, system_prompt),
             "stream": False,
-            "think": True,
+            "think": False,
             "options": {
                 "num_predict": self.MAX_GENERATED_TOKENS,
                 "temperature": 0,

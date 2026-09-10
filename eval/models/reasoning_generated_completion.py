@@ -5,3 +5,5 @@ from dataclasses import dataclass
 class ReasoningGeneratedCompletion:
     answer: str
     reasoning_summary: str
+    runtime_seconds: float = 0.0
+    input_prompt_characters: int = 0
