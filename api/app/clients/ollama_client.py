@@ -5,7 +5,7 @@ from app.models import OllamaInference
 
 
 class OllamaClient:
-    MAX_GENERATED_TOKENS = 2048
+    MAX_GENERATED_TOKENS = 4096
     MAX_SUMMARY_TOKENS = 512
 
     def __init__(

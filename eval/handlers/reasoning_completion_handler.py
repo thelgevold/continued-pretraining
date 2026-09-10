@@ -45,7 +45,7 @@ class ReasoningCompletionHandler:
         reasoning_case: ReasoningCase,
     ) -> ReasoningGeneratedCompletion:
         response = httpx.post(
-            f"{self._api_base_url}/question",
+            f"{self._api_base_url}{self._question_path(reasoning_case)}",
             json={"question": reasoning_case.question},
             timeout=300.0,
         )
@@ -55,3 +55,9 @@ class ReasoningCompletionHandler:
             answer=str(payload["answer"]),
             reasoning_summary=str(payload["reasoning_summary"]),
         )
+
+    @staticmethod
+    def _question_path(reasoning_case: ReasoningCase) -> str:
+        if reasoning_case.use_historic_site_retrieval:
+            return "/historic-site-question"
+        return "/question"

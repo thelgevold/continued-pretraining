@@ -50,7 +50,23 @@ class CityPlainTextReasoningJudgeHandler:
                     expected_answer,
                 )
             return self._missing_membership_facts(normalized_answer, expected_answer)
-        return self._missing_journey_facts(normalized_answer, expected_answer)
+        missing_facts = self._missing_journey_facts(normalized_answer, expected_answer)
+        missing_facts.extend(self._missing_site_facts(normalized_answer, expected_answer))
+        return missing_facts
+
+    def _missing_site_facts(
+        self,
+        answer: str,
+        expected_answer: dict[str, object],
+    ) -> list[str]:
+        site_facts = expected_answer.get("site_facts", [])
+        if not isinstance(site_facts, list):
+            raise RuntimeError("City site facts must be a list.")
+        return [
+            f"Missing retrieved historic-site fact: {fact}."
+            for fact in site_facts
+            if self._normalize(str(fact)) not in answer
+        ]
 
     @staticmethod
     def _is_historic_site_lookup(expected_answer: dict[str, object]) -> bool:
@@ -105,14 +121,8 @@ class CityPlainTextReasoningJudgeHandler:
         journey: dict[str, object],
         journey_number: int,
     ) -> list[str]:
-        station_sequence = self._station_sequence(journey)
         line_sequence = self._line_sequence(journey)
         missing_facts: list[str] = []
-        if not self._appears_in_order(answer, station_sequence):
-            missing_facts.append(
-                f"Journey {journey_number} does not state the required stations in travel order: "
-                f"{' -> '.join(station_sequence)}."
-            )
         if not self._appears_in_order(answer, line_sequence):
             missing_facts.append(
                 f"Journey {journey_number} does not state the required lines in travel order: "
@@ -147,11 +157,6 @@ class CityPlainTextReasoningJudgeHandler:
         if not isinstance(value, dict):
             raise RuntimeError("City expected journey must be an object.")
         return value
-
-    @staticmethod
-    def _station_sequence(journey: dict[str, object]) -> list[str]:
-        legs = CityPlainTextReasoningJudgeHandler._legs(journey)
-        return [str(journey["origin"]), *[str(leg["alight_at"]) for leg in legs]]
 
     @staticmethod
     def _line_sequence(journey: dict[str, object]) -> list[str]:

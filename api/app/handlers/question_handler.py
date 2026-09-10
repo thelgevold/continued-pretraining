@@ -5,8 +5,8 @@ from app.models import QuestionRequest, QuestionResponse
 CITY_PLAIN_TEXT_PROMPT = (
     "Reason internally before answering and verify every required fact. "
     "Return a clear ordinary-English answer, not JSON, code, a schema, or "
-    "Markdown. For a subway journey, name each line and station in the "
-    "order traveled. State explicitly when a transfer occurs and name its "
+    "Markdown. For a subway journey, name each line. State explicitly when a "
+    "transfer occurs and name its "
     "station. Include only facts supported by the trained Awesomeville data; "
     "never guess or substitute an unsupported station, line, attraction, or "
     "access point. A route leg begins at the requested origin or the previous "

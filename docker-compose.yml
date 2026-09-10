@@ -17,15 +17,27 @@ services:
       EVAL_API_BASE_URL: http://127.0.0.1:8000
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL_NAME: ${OLLAMA_MODEL_NAME:?Missing OLLAMA_MODEL_NAME}
+      HISTORIC_SITE_MCP_URL: http://historic-site-rag:8001/mcp
     depends_on:
       ollama:
         condition: service_healthy
+      historic-site-rag:
+        condition: service_started
     ports:
       - "8000:8000"
     volumes:
       - ./api/app:/app/app
       - ./eval:/app/eval
       - ./city_training:/app/city_training:ro
+
+  historic-site-rag:
+    build:
+      context: .
+      dockerfile: rag/Dockerfile
+    volumes:
+      - ./rag/app:/app/rag/app
+      - ./rag/documents:/app/rag/documents:ro
+      - ./shared:/app/shared
 
   ollama:
     build:

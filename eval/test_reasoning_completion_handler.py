@@ -40,6 +40,34 @@ def test_generate_completion_calls_question_api() -> None:
     response.raise_for_status.assert_called_once_with()
 
 
+def test_generate_completion_enables_retrieval_only_when_the_case_requires_it() -> None:
+    response = Mock()
+    response.json.return_value = {"answer": "Generated answer", "reasoning_summary": "Reasoning"}
+    reasoning_case = ReasoningCase(
+        name="historic-site-case",
+        section="city_historic_site_rag_routes",
+        question="Question text",
+        expected_answer={"answer": "Expected answer"},
+        required_phrases=("Expected",),
+        expectation=ReasoningExpectation((), False, None, (), ()),
+        use_historic_site_retrieval=True,
+    )
+
+    with patch(
+        "eval.handlers.reasoning_completion_handler.httpx.post",
+        return_value=response,
+    ) as post:
+        ReasoningCompletionHandler("http://evaluation-api").generate_completion(
+            reasoning_case
+        )
+
+    post.assert_called_once_with(
+        "http://evaluation-api/historic-site-question",
+        json={"question": "Question text"},
+        timeout=300.0,
+    )
+
+
 def test_generate_completion_retries_a_transient_server_error() -> None:
     failed_response = Mock()
     failed_response.raise_for_status.side_effect = httpx.HTTPStatusError(

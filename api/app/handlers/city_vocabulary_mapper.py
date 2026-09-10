@@ -28,24 +28,10 @@ class CityVocabularyMapper:
         "Heritage Theater": "green_historic_site_two_b",
     }
 
-    _HISTORIC_CONTEXT = re.compile(
-        r"\b(?:historic|history|historical|museum|theater|theatre|attraction|"
-        r"sightseeing|site)\b",
-        flags=re.IGNORECASE,
-    )
-
     def to_synthetic_input(self, text: str) -> str:
         mapped = text
         for human_name, synthetic_name in self._SITE_TO_SYNTHETIC.items():
-            if human_name == "Founder's Square":
-                continue
             mapped = self._replace(mapped, human_name, synthetic_name)
-        founders_replacement = (
-            self._SITE_TO_SYNTHETIC["Founder's Square"]
-            if self._HISTORIC_CONTEXT.search(text)
-            else self._STATION_TO_SYNTHETIC["Founder's Square"]
-        )
-        mapped = self._replace(mapped, "Founder's Square", founders_replacement)
         for human_name, synthetic_name in self._STATION_TO_SYNTHETIC.items():
             if human_name == "Founder's Square":
                 continue
