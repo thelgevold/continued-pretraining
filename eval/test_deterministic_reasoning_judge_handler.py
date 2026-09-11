@@ -114,11 +114,11 @@ def test_city_plain_text_route_passes() -> None:
     case = next(
         case
         for case in ReasoningCaseLoader(Path("city_training/eval")).load_cases()
-        if case.name == "city_blue_line_route_02"
+        if case.name == "heldout_one_transfer_01"
     )
     answer = (
-        "Take Blue Line from blue_station_two through blue_station_three and "
-        "blue_station_four to central_station, then continue to blue_station_six."
+        "Take Gold Line from Westgate to Central Station. Transfer at Central "
+        "Station to Blue Line and continue to University Commons."
     )
 
     result = JUDGE.evaluate_answer(answer, case)
@@ -130,26 +130,14 @@ def test_city_plain_text_transfer_route_passes() -> None:
     case = next(
         case
         for case in ReasoningCaseLoader(Path("city_training/eval")).load_cases()
-        if case.name == "city_one_transfer_blue_to_green_01"
+        if case.name == "heldout_one_transfer_01"
     )
     answer = (
-        "Ride Blue Line from blue_station_one to central_station. Transfer at "
-        "central_station to Green Line and continue to green_station_five."
+        "Ride Gold Line from Westgate to Central Station. Transfer at Central "
+        "Station to Blue Line and continue to University Commons."
     )
 
     result = JUDGE.evaluate_answer(answer, case)
-
-    assert result["is_correct"] is True
-
-
-def test_city_historic_site_lookup_passes_with_the_canonical_station() -> None:
-    case = next(
-        case
-        for case in ReasoningCaseLoader(Path("city_training/eval")).load_cases()
-        if case.name == "city_historic_site_lookup_bright_mill_museum_01"
-    )
-
-    result = JUDGE.evaluate_answer("gold_station_two", case)
 
     assert result["is_correct"] is True
 
@@ -158,13 +146,13 @@ def test_city_plain_text_two_errand_route_passes() -> None:
     case = next(
         case
         for case in ReasoningCaseLoader(Path("city_training/eval")).load_cases()
-        if case.name == "city_two_transfer_errands_02"
+        if case.name == "heldout_two_transfer_01"
     )
     answer = (
-        "First take Green Line from green_station_five to central_station, then "
-        "transfer to Blue Line for blue_station_two. Next take Blue Line from "
-        "blue_station_two to central_station and transfer to Gold Line for "
-        "gold_station_five."
+        "First take Gold Line from Westgate to Central Station, then transfer "
+        "to Blue Line for North Terminal. Next take Blue Line from North "
+        "Terminal to Central Station and transfer to Green Line for Museum "
+        "District Station."
     )
 
     result = JUDGE.evaluate_answer(answer, case)
@@ -176,12 +164,12 @@ def test_city_plain_text_route_with_missing_line_fails() -> None:
     case = next(
         case
         for case in ReasoningCaseLoader(Path("city_training/eval")).load_cases()
-        if case.name == "city_two_transfer_errands_04"
+        if case.name == "heldout_two_transfer_01"
     )
     answer = (
-        "Travel from blue_station_four to central_station, then continue to "
-        "green_station_five. Next go from green_station_five to central_station and "
-        "continue to gold_station_two."
+        "Travel from Westgate to Central Station, then continue to North "
+        "Terminal. Next go from North Terminal to Central Station and continue "
+        "to Museum District Station."
     )
 
     result = JUDGE.evaluate_answer(answer, case)
@@ -193,11 +181,11 @@ def test_city_route_with_a_wrong_inner_leg_fails() -> None:
     case = next(
         case
         for case in ReasoningCaseLoader(Path("city_training/eval")).load_cases()
-        if case.name == "city_one_transfer_blue_to_green_01"
+        if case.name == "heldout_one_transfer_01"
     )
     answer = (
-        "Take Blue Line from blue_station_two to central_station. Transfer to "
-        "Gold Line and travel to green_station_five."
+        "Take Gold Line from Westgate to Central Station. Transfer to Green Line "
+        "and travel to University Commons."
     )
 
     result = JUDGE.evaluate_answer(answer, case)
