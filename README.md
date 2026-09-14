@@ -1,6 +1,7 @@
 Blog posts:
 
 https://www.teachmecoolstuff.com/viewarticle/teaching-a-local-llm-a-new-domain
+
 https://www.teachmecoolstuff.com/viewarticle/comparing-rag-and-continued-pretraining-of-llms
 
 # Awesomeville city training
