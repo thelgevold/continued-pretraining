@@ -134,7 +134,7 @@
   {
     "name": "city_announcement_east_harbor_closure_route_01",
     "section": "city_announcement_routes",
-    "question": "From University Commons, how do I reach the station travelers must continue to because East Harbor is closed today?",
+    "question": "From University Commons, how do I reach the station travelers must continue to because of today's subway station closure?",
     "expected_answer": {
       "journey": {
         "origin": "University Commons",
