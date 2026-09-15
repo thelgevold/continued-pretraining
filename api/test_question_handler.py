@@ -2,7 +2,11 @@
 from unittest.mock import AsyncMock, Mock
 
 from app.handlers.city_vocabulary_mapper import CityVocabularyMapper
-from app.handlers.question_handler import CITY_PLAIN_TEXT_PROMPT, QuestionHandler
+from app.handlers.question_handler import (
+    CITY_ANNOUNCEMENTS_PROMPT,
+    CITY_PLAIN_TEXT_PROMPT,
+    QuestionHandler,
+)
 from app.models import OllamaInference, QuestionRequest
 
 
@@ -14,8 +18,10 @@ def test_question_response_uses_human_readable_names_at_the_api_boundary() -> No
             thinking="blue_station_one and blue_station_four are on Blue Line.",
         )
     )
+    announcements_retriever = Mock()
+    announcements_retriever.retrieve.return_value = "Concert at Westgate today."
     response = asyncio.run(
-        QuestionHandler(ollama_client=ollama_client).handle(
+        QuestionHandler(ollama_client, announcements_retriever).handle(
             QuestionRequest(question="How do I travel from North Terminal to River Market?")
         )
     )
@@ -25,7 +31,10 @@ def test_question_response_uses_human_readable_names_at_the_api_boundary() -> No
     ollama_client.ask_question.assert_awaited_once_with(
         question="How do I travel from blue_station_one to blue_station_four?",
         inference_seed=42,
-        system_prompt=CITY_PLAIN_TEXT_PROMPT,
+        system_prompt=(
+            f"{CITY_PLAIN_TEXT_PROMPT}{CITY_ANNOUNCEMENTS_PROMPT}"
+            "Concert at gold_station_one today."
+        ),
     )
 
 

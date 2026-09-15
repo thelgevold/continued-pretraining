@@ -1,6 +1,8 @@
 fastapi==0.116.0
 fastmcp==2.13.0
 httpx==0.28.1
+chromadb==1.0.15
 llama-index-core==0.12.52
+llama-index-vector-stores-chroma==0.4.2
 pytest==8.4.1
 uvicorn==0.35.0

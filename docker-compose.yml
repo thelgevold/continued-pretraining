@@ -18,6 +18,8 @@ services:
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL_NAME: ${OLLAMA_MODEL_NAME:?Missing OLLAMA_MODEL_NAME}
       HISTORIC_SITE_MCP_URL: http://historic-site-rag:8001/mcp
+      CITY_ANNOUNCEMENTS_PATH: /app/city_announcements
+      CITY_ANNOUNCEMENTS_CHROMA_PATH: /app/city_announcements/chroma_db
     depends_on:
       ollama:
         condition: service_healthy
@@ -29,6 +31,7 @@ services:
       - ./api/app:/app/app
       - ./eval:/app/eval
       - ./city_training:/app/city_training:ro
+      - ./city_announcements:/app/city_announcements
 
   historic-site-rag:
     build:

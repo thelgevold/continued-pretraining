@@ -78,7 +78,19 @@ function Wait-OllamaHealth {
     throw "Ollama did not become healthy after registering '$ModelName'."
 }
 
+function Wait-ApiReady {
+    for ($attempt = 1; $attempt -le 30; $attempt++) {
+        docker compose exec -T api python -c "import httpx; httpx.get('http://127.0.0.1:8000/openapi.json').raise_for_status()" *> $null
+        if ($LASTEXITCODE -eq 0) {
+            return
+        }
+        Start-Sleep -Seconds 2
+    }
+    throw "API did not become ready after starting '$ModelName'."
+}
+
 $env:OLLAMA_MODEL_NAME = $ModelName
+$env:SUBWAY_RAG_BASE_MODEL = $ModelName
 
 docker compose up -d ollama
 if ($LASTEXITCODE -ne 0) {
@@ -127,6 +139,8 @@ docker compose up -d api
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
+
+Wait-ApiReady
 
 docker compose exec -T `
     -e "OLLAMA_MODEL_NAME=$ModelName" `

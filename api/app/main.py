@@ -12,6 +12,7 @@ from app.handlers import (
     QuestionHandler,
 )
 from app.models import HistoricSiteQuestionRequest, QuestionRequest, QuestionResponse
+from app.services.city_announcements_retriever import CityAnnouncementsRetriever
 
 config = AppConfig()
 ollama_client = OllamaClient(
@@ -25,7 +26,13 @@ historic_site_ollama_client = HistoricSiteOllamaClient(
     base_url=config.ollama_base_url,
     model_name=config.ollama_model_name,
 )
-question_handler = QuestionHandler(ollama_client=ollama_client)
+question_handler = QuestionHandler(
+    ollama_client=ollama_client,
+    city_announcements_retriever=CityAnnouncementsRetriever(
+        documents_path=config.city_announcements_path,
+        chroma_path=config.city_announcements_chroma_path,
+    ),
+)
 historic_site_question_handler = HistoricSiteQuestionHandler(
     tool_calling_handler=HistoricSiteToolCallingHandler(
         ollama_client=historic_site_ollama_client,

@@ -42,3 +42,4 @@ training/outputs/
 .DS_Store
 Thumbs.db
 eval/reports
+city_announcements/chroma_db/

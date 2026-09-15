@@ -1,0 +1,178 @@
+[
+  {
+    "name": "city_announcement_concert_route_01",
+    "section": "city_announcement_routes",
+    "question": "Give me directions from Lake Harmony to the concert tonight.",
+    "expected_answer": {
+      "journey": {
+        "origin": "Lake Harmony",
+        "destination": "Westgate",
+        "transfer_count": 1,
+        "legs": [
+          {
+            "leg_number": 1,
+            "line": "Green Line",
+            "board_at": "Lake Harmony",
+            "alight_at": "Central Station",
+            "stations": ["Lake Harmony", "Central Station"]
+          },
+          {
+            "leg_number": 2,
+            "line": "Gold Line",
+            "board_at": "Central Station",
+            "alight_at": "Westgate",
+            "stations": ["Central Station", "Westgate"]
+          }
+        ],
+        "transfers": [
+          {
+            "station": "Central Station",
+            "from_line": "Green Line",
+            "to_line": "Gold Line"
+          }
+        ]
+      },
+      "description": "Take the Green Line from Lake Harmony to Central Station, then transfer to the Gold Line for the concert."
+    },
+    "required_phrases": ["Green Line", "Gold Line", "Central Station"],
+    "expectation": {
+      "journeys": [["Lake Harmony", "Central Station", "Westgate"]],
+      "require_complete_routes": false,
+      "transfer_count": 1,
+      "ordinal_positions": {},
+      "station_line_memberships": {}
+    }
+  },
+  {
+    "name": "city_announcement_egyptian_exhibit_route_01",
+    "section": "city_announcement_routes",
+    "question": "I am at North Terminal. How do I get to the brand-new Egyptian exhibit?",
+    "expected_answer": {
+      "journey": {
+        "origin": "North Terminal",
+        "destination": "Old Mill Station",
+        "transfer_count": 1,
+        "legs": [
+          {
+            "leg_number": 1,
+            "line": "Blue Line",
+            "board_at": "North Terminal",
+            "alight_at": "Central Station",
+            "stations": ["North Terminal", "Central Station"]
+          },
+          {
+            "leg_number": 2,
+            "line": "Gold Line",
+            "board_at": "Central Station",
+            "alight_at": "Old Mill Station",
+            "stations": ["Central Station", "Old Mill Station"]
+          }
+        ],
+        "transfers": [
+          {
+            "station": "Central Station",
+            "from_line": "Blue Line",
+            "to_line": "Gold Line"
+          }
+        ]
+      },
+      "description": "Take the Blue Line from North Terminal to Central Station, then transfer to the Gold Line for the Egyptian exhibit."
+    },
+    "required_phrases": ["Blue Line", "Gold Line", "Central Station"],
+    "expectation": {
+      "journeys": [["North Terminal", "Central Station", "Old Mill Station"]],
+      "require_complete_routes": false,
+      "transfer_count": 1,
+      "ordinal_positions": {},
+      "station_line_memberships": {}
+    }
+  },
+  {
+    "name": "city_announcement_hamlet_route_01",
+    "section": "city_announcement_routes",
+    "question": "What subway route should I take from South Gardens to see the new production of Hamlet?",
+    "expected_answer": {
+      "journey": {
+        "origin": "South Gardens",
+        "destination": "Museum District Station",
+        "transfer_count": 1,
+        "legs": [
+          {
+            "leg_number": 1,
+            "line": "Blue Line",
+            "board_at": "South Gardens",
+            "alight_at": "Central Station",
+            "stations": ["South Gardens", "Central Station"]
+          },
+          {
+            "leg_number": 2,
+            "line": "Green Line",
+            "board_at": "Central Station",
+            "alight_at": "Museum District Station",
+            "stations": ["Central Station", "Museum District Station"]
+          }
+        ],
+        "transfers": [
+          {
+            "station": "Central Station",
+            "from_line": "Blue Line",
+            "to_line": "Green Line"
+          }
+        ]
+      },
+      "description": "Take the Blue Line from South Gardens to Central Station, then transfer to the Green Line for Hamlet."
+    },
+    "required_phrases": ["Blue Line", "Green Line", "Central Station"],
+    "expectation": {
+      "journeys": [["South Gardens", "Central Station", "Museum District Station"]],
+      "require_complete_routes": false,
+      "transfer_count": 1,
+      "ordinal_positions": {},
+      "station_line_memberships": {}
+    }
+  },
+  {
+    "name": "city_announcement_east_harbor_closure_route_01",
+    "section": "city_announcement_routes",
+    "question": "From University Commons, how do I reach the station travelers must continue to because East Harbor is closed today?",
+    "expected_answer": {
+      "journey": {
+        "origin": "University Commons",
+        "destination": "Sunrise Point",
+        "transfer_count": 1,
+        "legs": [
+          {
+            "leg_number": 1,
+            "line": "Blue Line",
+            "board_at": "University Commons",
+            "alight_at": "Central Station",
+            "stations": ["University Commons", "Central Station"]
+          },
+          {
+            "leg_number": 2,
+            "line": "Gold Line",
+            "board_at": "Central Station",
+            "alight_at": "Sunrise Point",
+            "stations": ["Central Station", "Sunrise Point"]
+          }
+        ],
+        "transfers": [
+          {
+            "station": "Central Station",
+            "from_line": "Blue Line",
+            "to_line": "Gold Line"
+          }
+        ]
+      },
+      "description": "Take the Blue Line from University Commons to Central Station, then transfer to the Gold Line for the closure alternative."
+    },
+    "required_phrases": ["Blue Line", "Gold Line", "Central Station"],
+    "expectation": {
+      "journeys": [["University Commons", "Central Station", "Sunrise Point"]],
+      "require_complete_routes": false,
+      "transfer_count": 1,
+      "ordinal_positions": {},
+      "station_line_memberships": {}
+    }
+  }
+]
