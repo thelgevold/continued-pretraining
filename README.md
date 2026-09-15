@@ -4,6 +4,8 @@ https://www.teachmecoolstuff.com/viewarticle/teaching-a-local-llm-a-new-domain
 
 https://www.teachmecoolstuff.com/viewarticle/comparing-rag-and-continued-pretraining-of-llms
 
+https://www.teachmecoolstuff.com/viewarticle/combining-rag-with-continued-pretraining-of-llms
+
 # Awesomeville city training
 
 `city_training` is the sole supported experiment. Its locked continued-
