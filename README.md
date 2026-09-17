@@ -39,3 +39,15 @@ runs all reasoning cases in `city_training/eval`.
 ```
 
 Evaluation reports are written to `eval/reports/`.
+
+## Train and evaluate one model with transfer held-out cases
+
+The following command trains a selected base model on the locked City corpus.
+It imports the resulting export into Ollama, evaluates only the transfer
+held-out cases, and writes the normal JSON and Markdown reports to
+`eval/reports/`.
+
+```powershell
+.\scripts\run-city-line-transfer-heldout-evals.ps1 `
+  -BaseModel "Qwen/Qwen3.5-2B-Base"
+```
