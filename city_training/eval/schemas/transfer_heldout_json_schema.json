@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Awesomeville subway route legs",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "from_station",
+      "to_station",
+      "subway_line"
+    ],
+    "properties": {
+      "from_station": {
+        "type": "string"
+      },
+      "to_station": {
+        "type": "string"
+      },
+      "subway_line": {
+        "type": "string",
+        "enum": [
+          "Blue Line",
+          "Gold Line",
+          "Green Line"
+        ]
+      }
+    }
+  }
+}

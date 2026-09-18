@@ -2,6 +2,7 @@ import re
 
 import httpx
 from app.models import OllamaInference
+from app.models.subway_route_schema import SubwayRouteSchema
 
 
 class OllamaClient:
@@ -39,6 +40,7 @@ class OllamaClient:
             "messages": self._create_messages(question, system_prompt),
             "stream": False,
             "think": False,
+            "format": SubwayRouteSchema.as_dict(),
             "options": {
                 "num_predict": self.MAX_GENERATED_TOKENS,
                 "temperature": 0,

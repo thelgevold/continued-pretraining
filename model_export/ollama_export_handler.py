@@ -1,15 +1,18 @@
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from training.config import TrainingConfig
 from model_export.gguf_conversion_handler import GgufConversionHandler
 from model_export.hugging_face_merge_handler import (
     HuggingFaceMergeHandler,
 )
 
+if TYPE_CHECKING:
+    from training.config import TrainingConfig
+
 
 class OllamaExportHandler:
-    def __init__(self, config: TrainingConfig) -> None:
+    def __init__(self, config: "TrainingConfig") -> None:
         self._config = config
         self._hugging_face_merge_handler = HuggingFaceMergeHandler(config)
         self._gguf_conversion_handler = GgufConversionHandler(config)

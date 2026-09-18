@@ -1,11 +1,13 @@
 import subprocess
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from training.config import TrainingConfig
+if TYPE_CHECKING:
+    from training.config import TrainingConfig
 
 
 class GgufConversionHandler:
-    def __init__(self, config: TrainingConfig) -> None:
+    def __init__(self, config: "TrainingConfig") -> None:
         self._config = config
 
     def convert(self, model_dir: Path, output_dir: Path) -> dict[str, str | list[str]]:

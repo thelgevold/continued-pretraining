@@ -98,6 +98,25 @@ services:
       - huggingface-cache:/workspace/.cache/huggingface
     gpus: all
 
+  schema-training:
+    profiles: ["schema-training"]
+    build:
+      context: .
+      dockerfile: training/Dockerfile
+    entrypoint: ["python", "-m", "schema_training.train"]
+    environment:
+      SCHEMA_SFT_BASE_MODEL: ${SCHEMA_SFT_BASE_MODEL}
+      SCHEMA_SFT_CORPUS_PATH: ${SCHEMA_SFT_CORPUS_PATH}
+      SCHEMA_SFT_OUTPUT_DIR: ${SCHEMA_SFT_OUTPUT_DIR}
+      HF_DEACTIVATE_ASYNC_LOAD: "1"
+    volumes:
+      - ./training:/workspace/training
+      - ./schema_training:/workspace/schema_training
+      - ./city_training:/workspace/city_training:ro
+      - ./model_export:/workspace/model_export:ro
+      - huggingface-cache:/workspace/.cache/huggingface
+    gpus: all
+
 volumes:
   ollama-data:
   huggingface-cache:

@@ -4,9 +4,10 @@ from unittest.mock import patch
 import httpx
 
 from app.clients.ollama_client import OllamaClient
+from app.models.subway_route_schema import SubwayRouteSchema
 
 
-def test_question_returns_plain_text() -> None:
+def test_question_returns_schema_formatted_json() -> None:
     response = httpx.Response(
         200,
         request=httpx.Request("POST", "http://ollama/api/chat"),
@@ -24,8 +25,8 @@ def test_question_returns_plain_text() -> None:
         )
 
     assert inference.answer == "Take the Blue Line directly."
-    assert "format" not in client.payloads[0]
-    assert client.payloads[0]["think"] is True
+    assert client.payloads[0]["format"] == SubwayRouteSchema.as_dict()
+    assert client.payloads[0]["think"] is False
 
 
 class _AsyncClient:

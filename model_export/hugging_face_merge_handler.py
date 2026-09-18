@@ -1,12 +1,14 @@
 import json
 import shutil
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from training.config import TrainingConfig
+if TYPE_CHECKING:
+    from training.config import TrainingConfig
 
 
 class HuggingFaceMergeHandler:
-    def __init__(self, config: TrainingConfig) -> None:
+    def __init__(self, config: "TrainingConfig") -> None:
         self._config = config
 
     def merge_adapter(self, adapter_dir: Path, output_dir: Path) -> None:

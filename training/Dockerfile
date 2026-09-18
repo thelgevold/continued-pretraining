@@ -27,6 +27,7 @@ RUN mkdir -p /home/unsloth/.unsloth \
 
 COPY training /workspace/training
 COPY city_training /workspace/city_training
+COPY schema_training /workspace/schema_training
 COPY model_export /workspace/model_export
 COPY training/sitecustomize.py /usr/lib/python3.12/sitecustomize.py
 
