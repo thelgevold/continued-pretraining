@@ -4,10 +4,6 @@ from pathlib import Path
 
 
 class SchemaSftCorpusBuilder:
-    _SCHEMA = (
-        '[{"from_station":"string","to_station":"string",'
-        '"subway_line":"Blue Line | Gold Line | Green Line"}]'
-    )
     _LINES = {
         "Blue Line": (
             "blue_station_one",
@@ -143,10 +139,6 @@ class SchemaSftCorpusBuilder:
         return {
             "id": f"schema_sft_{transfer_count}_transfer_{index:03d}",
             "transfer_count": transfer_count,
-            "instruction": (
-                "Return only a JSON array that conforms to this schema: "
-                f"{self._SCHEMA}"
-            ),
             "input": f"Plan these journeys in order: {journey_text}.",
             "output": json.dumps(route, separators=(",", ":")),
         }

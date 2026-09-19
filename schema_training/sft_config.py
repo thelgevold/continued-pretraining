@@ -13,8 +13,10 @@ class SchemaSftConfig:
         self.base_model_name = self._require("SCHEMA_SFT_BASE_MODEL")
         self.corpus_path = Path(self._require("SCHEMA_SFT_CORPUS_PATH"))
         self.output_dir = Path(self._require("SCHEMA_SFT_OUTPUT_DIR"))
+        self.output_directory_name = self._require(
+            "SCHEMA_SFT_OUTPUT_DIRECTORY_NAME"
+        )
         self.llama_cpp_path = Path(self._require("UNSLOTH_LLAMA_CPP_PATH"))
-        self.output_directory_name = "schema_sft"
         self.num_train_epochs = 1
         self.learning_rate = 2e-4
         self.batch_size = 1

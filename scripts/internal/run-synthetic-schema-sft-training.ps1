@@ -7,7 +7,7 @@ param(
 )
 
 $projectRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$corpusPath = "schema_training\data\schema_sft_alpaca.jsonl"
+$corpusPath = "schema_training\data\synthetic_schema_sft_alpaca.jsonl"
 $trainingRoot = Join-Path $projectRoot "training"
 $containerTrainingPrefix = "/workspace/training/"
 if ($CptModelPath.StartsWith($containerTrainingPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -18,7 +18,7 @@ $resolvedCptModelPath = [System.IO.Path]::GetFullPath(
 )
 
 if (-not (Test-Path (Join-Path $projectRoot $corpusPath))) {
-    throw "The schema SFT corpus was not found at '$corpusPath'."
+    throw "The synthetic schema SFT corpus was not found at '$corpusPath'."
 }
 if (-not $resolvedCptModelPath.StartsWith($trainingRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
     throw "CptModelPath must be located under '$trainingRoot'."
@@ -29,12 +29,12 @@ if (-not (Test-Path (Join-Path $resolvedCptModelPath "config.json"))) {
 
 $cptModelRelativePath = $resolvedCptModelPath.Substring($trainingRoot.Length).TrimStart("\", "/")
 $env:SCHEMA_SFT_BASE_MODEL = "/workspace/training/" + ($cptModelRelativePath -replace "\\", "/")
-$env:SCHEMA_SFT_CORPUS_PATH = "/workspace/schema_training/data/schema_sft_alpaca.jsonl"
+$env:SCHEMA_SFT_CORPUS_PATH = "/workspace/schema_training/data/synthetic_schema_sft_alpaca.jsonl"
 $env:SCHEMA_SFT_OUTPUT_DIR = "/workspace/training/outputs"
-$env:SCHEMA_SFT_OUTPUT_DIRECTORY_NAME = "schema_sft"
+$env:SCHEMA_SFT_OUTPUT_DIRECTORY_NAME = "schema_synthetic_sft"
 $env:OLLAMA_MODEL_NAME = & (Join-Path $PSScriptRoot "resolve-awesomeville-model-name.ps1") `
     -BaseModel $BaseModel `
-    -TrainingVariant "schema-sft"
+    -TrainingVariant "schema-synthetic-sft"
 $env:SUBWAY_RAG_BASE_MODEL = $env:OLLAMA_MODEL_NAME
 
 docker compose stop api ollama

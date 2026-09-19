@@ -6,6 +6,7 @@ from model_export.ollama_export_handler import OllamaExportHandler
 from schema_training.handlers.schema_training_memory_cleanup_handler import (
     SchemaTrainingMemoryCleanupHandler,
 )
+from schema_training.prompts.schema_instruction import SCHEMA_INSTRUCTION
 from schema_training.sft_config import SchemaSftConfig
 
 
@@ -56,7 +57,7 @@ class SchemaSftTrainingHandler:
             "<|im_start|>user\n"
             "Below is an instruction that describes a task. Write a response that "
             "appropriately completes the request.\n\n"
-            f"### Instruction:\n{record['instruction']}\n\n"
+            f"### Instruction:\n{SCHEMA_INSTRUCTION}\n\n"
             f"### Input:\n{record['input']}\n\n"
             "### Response:\n"
             "<|im_end|>\n"
