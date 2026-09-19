@@ -11,13 +11,8 @@ class ReasoningCompletionHandler:
     EMPTY_ANSWER_MAX_ATTEMPTS = 2
     RETRY_DELAY_SECONDS = 1
 
-    def __init__(
-        self,
-        api_base_url: str,
-        historic_site_question_path: str = "/historic-site-question",
-    ) -> None:
+    def __init__(self, api_base_url: str) -> None:
         self._api_base_url = api_base_url
-        self._historic_site_question_path = historic_site_question_path
 
     def generate_completion(
         self,
@@ -51,7 +46,7 @@ class ReasoningCompletionHandler:
         reasoning_case: ReasoningCase,
     ) -> ReasoningGeneratedCompletion:
         response = httpx.post(
-            f"{self._api_base_url}{self._question_path(reasoning_case)}",
+            f"{self._api_base_url}/question",
             json={"question": reasoning_case.question},
             timeout=300.0,
         )
@@ -74,8 +69,3 @@ class ReasoningCompletionHandler:
             runtime_seconds=time.perf_counter() - started_at,
             input_prompt_characters=completion.input_prompt_characters,
         )
-
-    def _question_path(self, reasoning_case: ReasoningCase) -> str:
-        if reasoning_case.use_historic_site_retrieval:
-            return self._historic_site_question_path
-        return "/question"

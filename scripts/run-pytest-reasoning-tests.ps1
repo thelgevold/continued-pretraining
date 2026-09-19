@@ -79,7 +79,7 @@ function Wait-OllamaHealth {
 }
 
 function Wait-ApiReady {
-    for ($attempt = 1; $attempt -le 30; $attempt++) {
+    for ($attempt = 1; $attempt -le 180; $attempt++) {
         docker compose exec -T api python -c "import httpx; httpx.get('http://127.0.0.1:8000/openapi.json').raise_for_status()" *> $null
         if ($LASTEXITCODE -eq 0) {
             return

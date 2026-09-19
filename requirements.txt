@@ -1,5 +1,4 @@
 fastapi==0.116.0
-fastmcp==2.13.0
 httpx==0.28.1
 chromadb==1.0.15
 llama-index-core==0.12.52

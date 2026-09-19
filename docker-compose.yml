@@ -17,14 +17,11 @@ services:
       EVAL_API_BASE_URL: http://127.0.0.1:8000
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL_NAME: ${OLLAMA_MODEL_NAME:?Missing OLLAMA_MODEL_NAME}
-      HISTORIC_SITE_MCP_URL: http://historic-site-rag:8001/mcp
       CITY_ANNOUNCEMENTS_PATH: /app/city_announcements
       CITY_ANNOUNCEMENTS_CHROMA_PATH: /app/city_announcements/chroma_db
     depends_on:
       ollama:
         condition: service_healthy
-      historic-site-rag:
-        condition: service_started
     ports:
       - "8000:8000"
     volumes:
@@ -32,15 +29,6 @@ services:
       - ./eval:/app/eval
       - ./city_training:/app/city_training:ro
       - ./city_announcements:/app/city_announcements
-
-  historic-site-rag:
-    build:
-      context: .
-      dockerfile: rag/Dockerfile
-    volumes:
-      - ./rag/app:/app/rag/app
-      - ./rag/documents:/app/rag/documents:ro
-      - ./shared:/app/shared
 
   subway-rag-api:
     build:
@@ -56,7 +44,7 @@ services:
       - "8002:8000"
     volumes:
       - ./subway_rag/app:/app/subway_rag/app
-      - ./rag/documents/subway_network.txt:/app/documents/subway_network.txt:ro
+      - ./subway_rag/documents/subway_network.txt:/app/documents/subway_network.txt:ro
       - ./eval:/app/eval
       - ./city_training:/app/city_training:ro
 

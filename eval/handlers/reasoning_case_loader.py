@@ -72,9 +72,6 @@ class ReasoningCaseLoader:
             expected_answer=expected_answer,
             required_phrases=tuple(raw_case["required_phrases"]),
             expectation=self._create_expectation(raw_case["expectation"]),
-            use_historic_site_retrieval=(
-                raw_case["section"] == "city_historic_site_rag_routes"
-            ),
         )
 
     @staticmethod

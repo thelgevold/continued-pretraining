@@ -19,10 +19,6 @@ class EvalConfig:
         self.experiment_label = os.getenv("EVAL_EXPERIMENT_LABEL")
         self.case_prefix = os.getenv("EVAL_CASE_PREFIX")
         self.excluded_case_prefix = os.getenv("EVAL_EXCLUDE_CASE_PREFIX")
-        self.historic_site_question_path = os.getenv(
-            "EVAL_HISTORIC_SITE_QUESTION_PATH",
-            "/historic-site-question",
-        )
         self.cases_path = EvaluationCasePathHandler().resolve()
 
     def _require(self, name: str) -> str:
@@ -38,10 +34,7 @@ def reasoning_completions() -> dict[str, ReasoningGeneratedCompletion]:
         config.case_prefix,
         config.excluded_case_prefix,
     )
-    completion_handler = ReasoningCompletionHandler(
-        config.api_base_url,
-        config.historic_site_question_path,
-    )
+    completion_handler = ReasoningCompletionHandler(config.api_base_url)
     completions: dict[str, ReasoningGeneratedCompletion] = {}
     for case_number, reasoning_case in enumerate(cases, start=1):
         print(

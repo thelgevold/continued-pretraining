@@ -11,4 +11,3 @@ class ReasoningCase:
     expected_answer: dict[str, object]
     required_phrases: tuple[str, ...]
     expectation: ReasoningExpectation
-    use_historic_site_retrieval: bool = False

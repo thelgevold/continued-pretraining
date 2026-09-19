@@ -1,1 +1,1 @@
-"""Shared historic-site metadata."""
+"""Shared project utilities."""
