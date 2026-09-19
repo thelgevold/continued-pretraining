@@ -6,30 +6,38 @@ from eval.models.reasoning_expectation import ReasoningExpectation
 
 
 class ReasoningCaseLoader:
-    def __init__(self, cases_path: Path) -> None:
-        self._cases_path = cases_path
+    def __init__(self, cases_path: Path | tuple[Path, ...]) -> None:
+        self._cases_paths = (
+            cases_path if isinstance(cases_path, tuple) else (cases_path,)
+        )
 
     def load_cases(self) -> list[ReasoningCase]:
         raw_cases = self._load_raw_cases()
         return [self._create_case(raw_case) for raw_case in raw_cases]
 
     def _load_raw_cases(self) -> list[dict]:
-        if self._cases_path.is_dir():
-            return self._load_directory_cases()
-        return self._load_file_cases(self._cases_path)
-
-    def _load_directory_cases(self) -> list[dict]:
         return [
             raw_case
-            for cases_path in self._case_paths()
-            for raw_case in self._load_file_cases(cases_path)
+            for cases_path in self._cases_paths
+            for raw_case in self._load_path_cases(cases_path)
         ]
 
-    def _case_paths(self) -> list[Path]:
+    def _load_path_cases(self, cases_path: Path) -> list[dict]:
+        if cases_path.is_dir():
+            return self._load_directory_cases(cases_path)
+        return self._load_file_cases(cases_path)
+
+    def _load_directory_cases(self, cases_path: Path) -> list[dict]:
+        return [
+            raw_case for path in self._case_paths(cases_path) for raw_case in self._load_file_cases(path)
+        ]
+
+    @staticmethod
+    def _case_paths(cases_path: Path) -> list[Path]:
         return sorted(
             [
-                *self._cases_path.glob("*.json"),
-                *self._cases_path.glob("*.jsonl"),
+                *cases_path.glob("*.json"),
+                *cases_path.glob("*.jsonl"),
             ]
         )
 

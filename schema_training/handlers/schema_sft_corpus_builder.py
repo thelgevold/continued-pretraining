@@ -4,6 +4,21 @@ from pathlib import Path
 
 
 class SchemaSftCorpusBuilder:
+    _HISTORIC_SITE_EXAMPLES_PER_SITE = 5
+    _HISTORIC_SITE_ROUTES = (
+        (
+            "gold_historic_site_two",
+            "gold_station_two",
+            "Gold Line",
+            "the brand-new Egyptian exhibit",
+        ),
+        (
+            "green_historic_site_two_b",
+            "green_station_two",
+            "Green Line",
+            "the new production of Hamlet",
+        ),
+    )
     _LINES = {
         "Blue Line": (
             "blue_station_one",
@@ -49,6 +64,7 @@ class SchemaSftCorpusBuilder:
             *self._records(candidates, 1, 100),
             *self._records(candidates, 2, 100),
             *self._records(candidates, 3, 100),
+            *self._historic_site_records(held_out_journeys),
         ]
         self._validate(records, held_out_journeys)
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -143,15 +159,124 @@ class SchemaSftCorpusBuilder:
             "output": json.dumps(route, separators=(",", ":")),
         }
 
+    def _historic_site_records(
+        self,
+        held_out_journeys: set[tuple[str, str]],
+    ) -> list[dict[str, object]]:
+        return [
+            record
+            for site, access_station, access_line, event in self._HISTORIC_SITE_ROUTES
+            for record in self._site_records(
+                site,
+                access_station,
+                access_line,
+                event,
+                held_out_journeys,
+            )
+        ]
+
+    def _site_records(
+        self,
+        site: str,
+        access_station: str,
+        access_line: str,
+        event: str,
+        held_out_journeys: set[tuple[str, str]],
+    ) -> list[dict[str, object]]:
+        candidates = [
+            (station, line)
+            for line, stations in self._LINES.items()
+            for station in stations
+            if station != access_station
+            and (station, access_station) not in held_out_journeys
+        ]
+        selected_candidates = candidates[: self._HISTORIC_SITE_EXAMPLES_PER_SITE]
+        if len(selected_candidates) != self._HISTORIC_SITE_EXAMPLES_PER_SITE:
+            raise RuntimeError("Not enough non-held-out historic-site routes.")
+        return [
+            self._site_record(
+                site,
+                access_station,
+                access_line,
+                event,
+                origin,
+                origin_line,
+                index,
+            )
+            for index, (origin, origin_line) in enumerate(selected_candidates, start=1)
+        ]
+
+    @classmethod
+    def _site_record(
+        cls,
+        site: str,
+        access_station: str,
+        access_line: str,
+        event: str,
+        origin: str,
+        origin_line: str,
+        index: int,
+    ) -> dict[str, object]:
+        return {
+            "id": f"schema_sft_historic_site_{site}_{index:03d}",
+            "transfer_count": 1,
+            "is_historic_site_reinforcement": True,
+            "input": (
+                f"I am at {origin}. What subway route should I take for {event} "
+                f"at {site}?"
+            ),
+            "output": json.dumps(
+                cls._site_route(origin, origin_line, access_station, access_line),
+                separators=(",", ":"),
+            ),
+        }
+
+    @staticmethod
+    def _site_route(
+        origin: str,
+        origin_line: str,
+        access_station: str,
+        access_line: str,
+    ) -> list[dict[str, str]]:
+        if origin_line == access_line:
+            return [
+                {
+                    "from_station": origin,
+                    "to_station": access_station,
+                    "subway_line": access_line,
+                }
+            ]
+        return [
+            {
+                "from_station": origin,
+                "to_station": "central_station",
+                "subway_line": origin_line,
+            },
+            {
+                "from_station": "central_station",
+                "to_station": access_station,
+                "subway_line": access_line,
+            },
+        ]
+
     def _validate(
         self,
         records: list[dict[str, object]],
         held_out_journeys: set[tuple[str, str]],
     ) -> None:
-        if len(records) != 300:
-            raise RuntimeError("Schema SFT corpus must contain exactly 300 records.")
+        expected_record_count = 300 + (
+            len(self._HISTORIC_SITE_ROUTES) * self._HISTORIC_SITE_EXAMPLES_PER_SITE
+        )
+        if len(records) != expected_record_count:
+            raise RuntimeError(
+                f"Schema SFT corpus must contain exactly {expected_record_count} records."
+            )
         for transfer_count in (1, 2, 3):
-            if sum(record["transfer_count"] == transfer_count for record in records) != 100:
+            if sum(
+                record["transfer_count"] == transfer_count
+                and not record.get("is_historic_site_reinforcement", False)
+                for record in records
+            ) != 100:
                 raise RuntimeError("Each transfer count must contain exactly 100 records.")
         for record in records:
             route = json.loads(str(record["output"]))

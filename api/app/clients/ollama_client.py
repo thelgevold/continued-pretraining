@@ -6,7 +6,7 @@ from app.models.subway_route_schema import SubwayRouteSchema
 
 
 class OllamaClient:
-    MAX_GENERATED_TOKENS = 4096
+    MAX_GENERATED_TOKENS = 512
     MAX_SUMMARY_TOKENS = 512
 
     def __init__(

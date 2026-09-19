@@ -5,7 +5,7 @@ from eval.models.reasoning_case import ReasoningCase
 
 
 class ReasoningPerformanceCaseHandler:
-    def __init__(self, cases_path: Path) -> None:
+    def __init__(self, cases_path: Path | tuple[Path, ...]) -> None:
         self._cases_path = cases_path
         self._loader = ReasoningCaseLoader(cases_path=cases_path)
 

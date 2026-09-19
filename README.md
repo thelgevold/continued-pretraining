@@ -12,42 +12,45 @@ https://www.teachmecoolstuff.com/viewarticle/combining-rag-with-continued-pretra
 pretraining corpus is [city_lines.jsonl](city_training/data/city_lines.jsonl).
 No corpus-generation workflow is part of the supported project flow.
 
-## Train and evaluate
+## Official workflow
 
-Build the training image once to install Qwen 3.5 support:
+Build the training image once:
 
 ```powershell
 docker compose build training
 ```
 
-Then train, export, import, and evaluate the Qwen 3.5 4B Base model:
+### 1. CPT training
 
 ```powershell
-.\scripts\run-city-line-training-with-eval.ps1 -BaseModel "Qwen/Qwen3.5-4B-Base"
+.\scripts\internal\run-city-line-training.ps1 -BaseModel "Qwen/Qwen3.5-4B-Base"
 ```
 
-This trains the City model from the locked corpus, exports it to Ollama, and
-runs all reasoning cases in `city_training/eval`.
+This continued-pretrains the Qwen 3.5 4B Base model on the locked city corpus.
+Its merged model is written to `training/outputs/city_training/merged_model`.
 
-## Evaluate an existing City model
+### 2. SFT training
+
+```powershell
+.\scripts\internal\run-schema-sft-training.ps1 `
+  -BaseModel "Qwen/Qwen3.5-4B-Base" `
+  -CptModelPath "training/outputs/city_training/merged_model"
+```
+
+This fine-tunes the CPT merged model with the schema SFT corpus, including the
+historic-site access-station reinforcement examples.
+
+### 3. Evals
+
+Run the combined 104-case evaluation: 100 held-out transfer cases and four
+city-announcement RAG cases.
 
 ```powershell
 .\scripts\run-pytest-reasoning-tests.ps1 `
-  -ModelName "awesomeville-city-lines-qwen3.5-4b-q4_k_m" `
-  -ExperimentLabel "city-lines" `
-  -CasesPath "/app/city_training/eval"
+  -ModelName "awesomeville-schema-sft-qwen3.5-4b-q4_k_m" `
+  -ExperimentLabel "schema-sft-transfer-heldout-json-and-rag" `
+  -CasesPath "/app/city_training/eval/transfer_heldout_json_cases.jsonl,/app/eval/cases/city_announcement_routes.json" `
+  -ImportCurrentExport
 ```
 
 Evaluation reports are written to `eval/reports/`.
-
-## Train and evaluate one model with transfer held-out cases
-
-The following command trains a selected base model on the locked City corpus.
-It imports the resulting export into Ollama, evaluates only the transfer
-held-out cases, and writes the normal JSON and Markdown reports to
-`eval/reports/`.
-
-```powershell
-.\scripts\run-city-line-transfer-heldout-evals.ps1 `
-  -BaseModel "Qwen/Qwen3.5-2B-Base"
-```

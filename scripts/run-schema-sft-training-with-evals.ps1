@@ -18,7 +18,7 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 & (Join-Path $PSScriptRoot "run-pytest-reasoning-tests.ps1") `
     -ModelName $modelName `
-    -ExperimentLabel "schema-sft-transfer-heldout-json" `
-    -CasesPath "/app/city_training/eval/transfer_heldout_json_cases.jsonl" `
+    -ExperimentLabel "schema-sft-transfer-heldout-json-and-rag" `
+    -CasesPath "/app/city_training/eval/transfer_heldout_json_cases.jsonl,/app/eval/cases/city_announcement_routes.json" `
     -ImportCurrentExport
 exit $LASTEXITCODE

@@ -43,10 +43,14 @@ class SchemaSftTrainingHandler:
         return [{"text": self._format_record(record)} for record in records]
 
     def _validate_records(self, records: list[dict[str, object]]) -> None:
-        if len(records) != 300:
-            raise RuntimeError("Schema SFT training requires exactly 300 records.")
+        if len(records) != 310:
+            raise RuntimeError("Schema SFT training requires exactly 310 records.")
         for transfer_count in (1, 2, 3):
-            count = sum(record["transfer_count"] == transfer_count for record in records)
+            count = sum(
+                record["transfer_count"] == transfer_count
+                and not record.get("is_historic_site_reinforcement", False)
+                for record in records
+            )
             if count != 100:
                 raise RuntimeError(
                     f"Schema SFT training requires 100 {transfer_count}-transfer records."
