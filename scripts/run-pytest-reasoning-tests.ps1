@@ -5,7 +5,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ExperimentLabel,
 
-    [string]$CasesPath = "/app/city_training/eval",
+    [string]$CasesPath = "/app/eval/cases",
 
     [string]$CasePrefix = "",
 

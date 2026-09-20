@@ -6,7 +6,7 @@ from schema_training.handlers.schema_sft_corpus_builder import SchemaSftCorpusBu
 def main() -> None:
     project_root = Path(__file__).resolve().parents[1]
     SchemaSftCorpusBuilder().build(
-        held_out_path=project_root / "city_training/eval/transfer_heldout_json_cases.jsonl",
+        held_out_path=project_root / "eval/cases/transfer_heldout_json_cases.jsonl",
         output_path=project_root / "schema_training/data/schema_sft_alpaca.jsonl",
     )
 

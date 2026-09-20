@@ -7,7 +7,7 @@ from eval.handlers.reasoning_case_loader import ReasoningCaseLoader
 
 
 CASE = ReasoningCaseLoader(
-    Path("city_training/eval/transfer_heldout_json_cases.jsonl")
+    Path("eval/cases/transfer_heldout_json_cases.jsonl")
 ).load_cases()[0]
 JUDGE = DeterministicReasoningJudgeHandler()
 

@@ -49,7 +49,7 @@ city-announcement RAG cases.
 .\scripts\run-pytest-reasoning-tests.ps1 `
   -ModelName "awesomeville-schema-sft-qwen3.5-4b-q4_k_m" `
   -ExperimentLabel "schema-sft-transfer-heldout-json-and-rag" `
-  -CasesPath "/app/city_training/eval/transfer_heldout_json_cases.jsonl,/app/eval/cases/city_announcement_routes.json" `
+  -CasesPath "/app/eval/cases" `
   -ImportCurrentExport
 ```
 
