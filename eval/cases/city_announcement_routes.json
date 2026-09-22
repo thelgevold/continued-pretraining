@@ -8,17 +8,17 @@
     "expectation": {"journeys": [["Lake Harmony", "Central Station", "Westgate"]], "require_complete_routes": false, "transfer_count": 1, "ordinal_positions": {}, "station_line_memberships": {}}
   },
   {
-    "name": "city_announcement_egyptian_exhibit_route_01",
+    "name": "city_announcement_nordic_viking_exhibit_route_01",
     "section": "city_announcement_routes",
-    "question": "I am at North Terminal. What MetroLink route should I take for the brand-new Egyptian exhibit?",
-    "expected_answer": {"answer": [{"from_station": "North Terminal", "to_station": "Central Station", "subway_line": "Blue Line"}, {"from_station": "Central Station", "to_station": "Old Mill Station", "subway_line": "Gold Line"}]},
-    "required_phrases": ["Blue Line", "Gold Line", "Central Station"],
-    "expectation": {"journeys": [["North Terminal", "Central Station", "Old Mill Station"]], "require_complete_routes": false, "transfer_count": 1, "ordinal_positions": {}, "station_line_memberships": {}}
+    "question": "I am at North Terminal. What MetroLink route should I take for the new Nordic Viking exhibit?",
+    "expected_answer": {"answer": [{"from_station": "North Terminal", "to_station": "Central Station", "subway_line": "Blue Line"}, {"from_station": "Central Station", "to_station": "Museum District Station", "subway_line": "Green Line"}]},
+    "required_phrases": ["Blue Line", "Green Line", "Central Station"],
+    "expectation": {"journeys": [["North Terminal", "Central Station", "Museum District Station"]], "require_complete_routes": false, "transfer_count": 1, "ordinal_positions": {}, "station_line_memberships": {}}
   },
   {
-    "name": "city_announcement_hamlet_route_01",
+    "name": "city_announcement_ibsen_production_route_01",
     "section": "city_announcement_routes",
-    "question": "What MetroLink route should I take from South Gardens for the new production of Hamlet?",
+    "question": "What MetroLink route should I take from South Gardens for the new Ibsen production?",
     "expected_answer": {"answer": [{"from_station": "South Gardens", "to_station": "Central Station", "subway_line": "Blue Line"}, {"from_station": "Central Station", "to_station": "Museum District Station", "subway_line": "Green Line"}]},
     "required_phrases": ["Blue Line", "Green Line", "Central Station"],
     "expectation": {"journeys": [["South Gardens", "Central Station", "Museum District Station"]], "require_complete_routes": false, "transfer_count": 1, "ordinal_positions": {}, "station_line_memberships": {}}
