@@ -34,13 +34,22 @@ class ReasoningReportAuditHandler:
         report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
     def write_markdown(self, report: dict[str, object], report_path: Path) -> None:
-        lines = ["# Reasoning Evaluation Report", ""]
+        lines = [
+            "# Reasoning Evaluation Report",
+            "",
+            (
+                "Overall correctness: "
+                f"{float(report['meta']['correctness_percentage']):.1f}%"
+            ),
+            "",
+        ]
         for result in report["results"]:
             lines.extend(
                 [
                     f"## {result['name']}",
                     "",
                     f"- Status: {result['status']}",
+                    f"- Correctness: {float(result['score']):.1f}%",
                     f"- Audit reason: {result['audit_reason']}",
                     "",
                 ]
@@ -60,7 +69,7 @@ class ReasoningReportAuditHandler:
         cases: dict[str, object],
     ) -> dict[str, object]:
         judgment = self._judge.evaluate_answer(
-            result["actual_answer"],
+            self._answer_to_judge(result["actual_answer"]),
             cases[str(result["name"])],
         )
         is_correct = bool(judgment["is_correct"])
@@ -68,10 +77,18 @@ class ReasoningReportAuditHandler:
             **result,
             "status": "passed" if is_correct else "failed",
             "is_correct": is_correct,
+            "score": judgment["score"],
+            "match_type": judgment["match_type"],
             "audit_reason": judgment["reason"],
             "missing_facts": judgment["missing_facts"],
             "incorrect_facts": judgment["incorrect_facts"],
         }
+
+    @staticmethod
+    def _answer_to_judge(answer: object) -> object:
+        if isinstance(answer, dict) and set(answer) == {"answer"}:
+            return answer["answer"]
+        return answer
 
     def _meta(self, results: list[dict[str, object]]) -> dict[str, object]:
         sections = tuple(dict.fromkeys(str(result["section"]) for result in results))
@@ -98,6 +115,15 @@ class ReasoningReportAuditHandler:
             "passed": passed,
             "failed": statuses["failed"],
             "pass_percentage": round(passed * 100 / total, 1) if total else 0.0,
+            "correctness_percentage": (
+                round(
+                    sum(float(result.get("score", 0.0)) for result in results)
+                    / total,
+                    1,
+                )
+                if total
+                else 0.0
+            ),
         }
 
     @staticmethod

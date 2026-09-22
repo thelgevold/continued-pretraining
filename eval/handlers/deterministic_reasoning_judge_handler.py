@@ -15,12 +15,89 @@ class DeterministicReasoningJudgeHandler:
             actual_answer = SubwayRouteSchemaAnswer.deserialize(answer)
         except ValueError as error:
             return self._failure(str(error))
-        if actual_answer != expected_answer:
-            return self._failure("Answer does not match the expected route legs.")
+        if actual_answer == expected_answer:
+            return self._success(
+                "The route exactly matches the reference result.",
+                "exact_match",
+            )
+
+        missing_legs = self._missing_legs(actual_answer, expected_answer)
+        extra_legs = self._extra_legs(actual_answer, expected_answer)
+        score = self._percentage(
+            len(expected_answer.legs) - len(missing_legs),
+            len(expected_answer.legs),
+        )
+        if not missing_legs and self._are_superfluous_same_line_legs(
+            extra_legs,
+            expected_answer,
+        ):
+            return self._success(
+                "The route matches the reference after ignoring superfluous "
+                "same-line legs.",
+                "semantic_same_line_match",
+            )
+        return {
+            "is_correct": False,
+            "score": score,
+            "reason": "The route matches some, but not all, reference legs.",
+            "match_type": "partial_match",
+            "missing_facts": [self._format_leg(leg) for leg in missing_legs],
+            "incorrect_facts": [self._format_leg(leg) for leg in extra_legs],
+        }
+
+    @staticmethod
+    def _missing_legs(
+        actual_answer: SubwayRouteSchemaAnswer,
+        expected_answer: SubwayRouteSchemaAnswer,
+    ) -> list[tuple[str, str, str]]:
+        unmatched_actual_legs = list(actual_answer.legs)
+        missing_legs = []
+        for expected_leg in expected_answer.legs:
+            if expected_leg in unmatched_actual_legs:
+                unmatched_actual_legs.remove(expected_leg)
+            else:
+                missing_legs.append(expected_leg)
+        return missing_legs
+
+    @staticmethod
+    def _extra_legs(
+        actual_answer: SubwayRouteSchemaAnswer,
+        expected_answer: SubwayRouteSchemaAnswer,
+    ) -> list[tuple[str, str, str]]:
+        unmatched_expected_legs = list(expected_answer.legs)
+        extra_legs = []
+        for actual_leg in actual_answer.legs:
+            if actual_leg in unmatched_expected_legs:
+                unmatched_expected_legs.remove(actual_leg)
+            else:
+                extra_legs.append(actual_leg)
+        return extra_legs
+
+    @staticmethod
+    def _are_superfluous_same_line_legs(
+        extra_legs: list[tuple[str, str, str]],
+        expected_answer: SubwayRouteSchemaAnswer,
+    ) -> bool:
+        expected_lines = {leg[2] for leg in expected_answer.legs}
+        return bool(extra_legs) and all(
+            leg[2] in expected_lines for leg in extra_legs
+        )
+
+    @staticmethod
+    def _percentage(correct_legs: int, total_legs: int) -> float:
+        return round(correct_legs * 100 / total_legs, 1)
+
+    @staticmethod
+    def _format_leg(leg: tuple[str, str, str]) -> str:
+        return f"{leg[0]} to {leg[1]} on {leg[2]}"
+
+    @staticmethod
+    def _success(reason: str, match_type: str) -> dict[str, object]:
         return {
             "is_correct": True,
             "score": 100.0,
-            "reason": "All required facts are correct.",
+            "reason": reason,
+            "match_type": match_type,
             "missing_facts": [],
             "incorrect_facts": [],
         }
@@ -30,6 +107,7 @@ class DeterministicReasoningJudgeHandler:
             "is_correct": False,
             "score": 0.0,
             "reason": " ".join(errors),
+            "match_type": "invalid",
             "missing_facts": [],
             "incorrect_facts": list(errors),
         }

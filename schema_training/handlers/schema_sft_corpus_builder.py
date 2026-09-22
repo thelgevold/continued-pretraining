@@ -1,10 +1,10 @@
 import json
-from itertools import cycle
 from pathlib import Path
 
 
 class SchemaSftCorpusBuilder:
     _HISTORIC_SITE_EXAMPLES_PER_SITE = 5
+    _UNIQUE_ROUTE_PATTERNS = 32
     _HISTORIC_SITE_ROUTES = (
         (
             "gold_historic_site_two",
@@ -61,9 +61,9 @@ class SchemaSftCorpusBuilder:
         held_out_journeys = self._held_out_journeys(held_out_path)
         candidates = self._candidates(held_out_journeys)
         records = [
-            *self._records(candidates, 1, 100),
-            *self._records(candidates, 2, 100),
-            *self._records(candidates, 3, 100),
+            *self._records(candidates, 1, 100, held_out_journeys),
+            *self._records(candidates, 2, 100, held_out_journeys),
+            *self._records(candidates, 3, 100, held_out_journeys),
             *self._historic_site_records(held_out_journeys),
         ]
         self._validate(records, held_out_journeys)
@@ -118,13 +118,91 @@ class SchemaSftCorpusBuilder:
         candidates: list[tuple[str, str, str, str]],
         transfer_count: int,
         record_count: int,
+        held_out_journeys: set[tuple[str, str]] | None = None,
     ) -> list[dict[str, object]]:
-        candidate_cycle = cycle(candidates)
         records = []
         for index in range(record_count):
-            journeys = [next(candidate_cycle) for _ in range(transfer_count)]
+            journeys = self._journeys_for_record(
+                candidates,
+                transfer_count,
+                index,
+                held_out_journeys or set(),
+            )
             records.append(self._record(transfer_count, index + 1, journeys))
         return records
+
+    def _journeys_for_record(
+        self,
+        candidates: list[tuple[str, str, str, str]],
+        transfer_count: int,
+        index: int,
+        held_out_journeys: set[tuple[str, str]],
+    ) -> list[tuple[str, str, str, str]]:
+        pattern_index = index % SchemaSftCorpusBuilder._UNIQUE_ROUTE_PATTERNS
+        journeys = [self._candidate_for_pattern(candidates, pattern_index)]
+        if transfer_count == 1 and index < self._UNIQUE_ROUTE_PATTERNS:
+            journeys.append(
+                self._same_line_continuation(
+                    journeys[-1],
+                    pattern_index,
+                    held_out_journeys,
+                )
+            )
+            return journeys
+        for offset in range(1, transfer_count):
+            journeys.append(
+                SchemaSftCorpusBuilder._next_journey(
+                    candidates,
+                    journeys[-1],
+                    pattern_index + offset,
+                )
+            )
+        return journeys
+
+    def _candidate_for_pattern(
+        self,
+        candidates: list[tuple[str, str, str, str]],
+        pattern_index: int,
+    ) -> tuple[str, str, str, str]:
+        candidate_index = (
+            pattern_index * len(candidates) // self._UNIQUE_ROUTE_PATTERNS
+        )
+        return candidates[candidate_index]
+
+    def _same_line_continuation(
+        self,
+        previous_journey: tuple[str, str, str, str],
+        index: int,
+        held_out_journeys: set[tuple[str, str]],
+    ) -> tuple[str, str, str, str]:
+        _, _, _, line = previous_journey
+        continuations = [
+            station
+            for station in self._LINES[line]
+            if station != previous_journey[2]
+            and (previous_journey[2], station) not in held_out_journeys
+        ]
+        if not continuations:
+            raise RuntimeError("Not enough non-held-out same-line continuations.")
+        return (
+            previous_journey[2],
+            line,
+            continuations[index % len(continuations)],
+            line,
+        )
+
+    @staticmethod
+    def _next_journey(
+        candidates: list[tuple[str, str, str, str]],
+        previous_journey: tuple[str, str, str, str],
+        index: int,
+    ) -> tuple[str, str, str, str]:
+        continuations = [
+            candidate
+            for candidate in candidates
+            if candidate[0] == previous_journey[2]
+        ]
+        return continuations[index % len(continuations)]
 
     def _record(
         self,
@@ -132,32 +210,65 @@ class SchemaSftCorpusBuilder:
         index: int,
         journeys: list[tuple[str, str, str, str]],
     ) -> dict[str, object]:
-        journey_text = "; ".join(
-            f"{from_station} to {to_station}"
-            for from_station, _, to_station, _ in journeys
-        )
+        journey_text = self._journey_text(journeys)
         route = [
             leg
             for from_station, from_line, to_station, to_line in journeys
-            for leg in (
-                {
-                    "from_station": from_station,
-                    "to_station": "central_station",
-                    "subway_line": from_line,
-                },
-                {
-                    "from_station": "central_station",
-                    "to_station": to_station,
-                    "subway_line": to_line,
-                },
+            for leg in self._route_legs(
+                from_station,
+                from_line,
+                to_station,
+                to_line,
             )
         ]
         return {
             "id": f"schema_sft_{transfer_count}_transfer_{index:03d}",
             "transfer_count": transfer_count,
-            "input": f"Plan these journeys in order: {journey_text}.",
+            "input": journey_text,
             "output": json.dumps(route, separators=(",", ":")),
         }
+
+    @staticmethod
+    def _route_legs(
+        from_station: str,
+        from_line: str,
+        to_station: str,
+        to_line: str,
+    ) -> list[dict[str, str]]:
+        if from_line == to_line:
+            return [{
+                "from_station": from_station,
+                "to_station": to_station,
+                "subway_line": from_line,
+            }]
+        return [
+            {
+                "from_station": from_station,
+                "to_station": "central_station",
+                "subway_line": from_line,
+            },
+            {
+                "from_station": "central_station",
+                "to_station": to_station,
+                "subway_line": to_line,
+            },
+        ]
+
+    @staticmethod
+    def _journey_text(journeys: list[tuple[str, str, str, str]]) -> str:
+        if len(journeys) == 1:
+            from_station, _, to_station, _ = journeys[0]
+            return f"What is the subway route from {from_station} to {to_station}?"
+        counts = {2: "two", 3: "three"}
+        ordinal_names = ("first", "second", "third")
+        requests = ", then ".join(
+            f"{ordinal_names[index]} {from_station} to {to_station}"
+            for index, (from_station, _, to_station, _) in enumerate(journeys)
+        )
+        return (
+            f"Plan {counts[len(journeys)]} connected subway journeys: {requests}. "
+            "Continue from each previous destination."
+        )
 
     def _historic_site_records(
         self,

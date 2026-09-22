@@ -90,3 +90,43 @@ def test_report_preserves_malformed_answer_inside_an_object(tmp_path) -> None:
         (tmp_path / "reasoning_eval_report.json").read_text(encoding="utf-8")
     )
     assert report["results"][0]["actual_answer"] == "not valid json"
+
+
+def test_report_wraps_json_route_array_like_expected_answer(tmp_path) -> None:
+    reasoning_case = ReasoningCase(
+        name="route",
+        section="routes",
+        question="Route question",
+        expected_answer={
+            "answer": [
+                {
+                    "from_station": "Westgate",
+                    "to_station": "Central Station",
+                    "subway_line": "Gold Line",
+                }
+            ]
+        },
+        required_phrases=(),
+        expectation=ReasoningExpectation((), False, None, (), ()),
+    )
+    handler = ReasoningReportHandler(
+        report_directory=tmp_path,
+        expected_cases=[reasoning_case],
+        model_name="example-model",
+    )
+
+    handler.record_completion(
+        reasoning_case,
+        ReasoningGeneratedCompletion(
+            answer=(
+                '[{"from_station":"Westgate","to_station":"Central Station",'
+                '"subway_line":"Gold Line"}]'
+            ),
+            reasoning_summary="Structured route.",
+        ),
+    )
+
+    report = json.loads(
+        (tmp_path / "reasoning_eval_report.json").read_text(encoding="utf-8")
+    )
+    assert report["results"][0]["actual_answer"] == reasoning_case.expected_answer

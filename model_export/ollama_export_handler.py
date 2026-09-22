@@ -70,6 +70,7 @@ class OllamaExportHandler:
             "{{ end }}{{ if .Prompt }}<|im_start|>user",
             "{{ .Prompt }}<|im_end|>",
             "{{ end }}<|im_start|>assistant",
+            "",
             '{{ .Response }}{{ if .Response }}<|im_end|>{{ end }}"""',
             'PARAMETER stop "<|im_end|>"',
             'PARAMETER stop "<|im_start|>"',

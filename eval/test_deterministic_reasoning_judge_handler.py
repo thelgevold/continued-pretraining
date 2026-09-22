@@ -22,6 +22,38 @@ def test_schema_route_leg_array_passes() -> None:
     )
 
     assert result["is_correct"] is True
+    assert result["score"] == 100.0
+    assert result["match_type"] == "exact_match"
+
+
+def test_one_correct_leg_receives_partial_correctness_score() -> None:
+    result = JUDGE.evaluate_answer(
+        """[
+            {"from_station":"Westgate","to_station":"Central Station","subway_line":"Gold Line"}
+        ]""",
+        CASE,
+    )
+
+    assert result["is_correct"] is False
+    assert result["score"] == 50.0
+    assert result["missing_facts"] == [
+        "central station to university commons on blue line"
+    ]
+
+
+def test_extra_same_line_leg_is_semantically_correct() -> None:
+    result = JUDGE.evaluate_answer(
+        """[
+            {"from_station":"Westgate","to_station":"Central Station","subway_line":"Gold Line"},
+            {"from_station":"Central Station","to_station":"University Commons","subway_line":"Blue Line"},
+            {"from_station":"Westgate","to_station":"Central Station","subway_line":"Gold Line"}
+        ]""",
+        CASE,
+    )
+
+    assert result["is_correct"] is True
+    assert result["score"] == 100.0
+    assert result["match_type"] == "semantic_same_line_match"
 
 
 def test_non_json_answer_fails() -> None:

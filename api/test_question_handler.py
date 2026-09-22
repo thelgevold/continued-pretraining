@@ -50,3 +50,11 @@ def test_vocabulary_mapper_uses_historic_site_identifiers_without_question_categ
     assert mapper.to_synthetic_input("How do I travel from Founder's Square to River Market?") == (
         "How do I travel from blue_historic_site_three to blue_station_four?"
     )
+
+
+def test_prompt_describes_connected_journeys() -> None:
+    assert "multiple connected journeys" in CITY_PLAIN_TEXT_PROMPT
+    assert "one direct leg on that line" in CITY_PLAIN_TEXT_PROMPT
+    assert "entire response must be one parseable JSON array" in CITY_PLAIN_TEXT_PROMPT
+    assert "final characters must be \"}]\"" in CITY_PLAIN_TEXT_PROMPT
+    assert "fresh journey" not in CITY_PLAIN_TEXT_PROMPT

@@ -32,7 +32,7 @@ class ReasoningReportHandler:
             name=reasoning_case.name,
             question=reasoning_case.question,
             expected_answer=reasoning_case.expected_answer,
-            actual_answer=completion.answer,
+            actual_answer=self._structure_actual_answer(completion.answer),
             reasoning_summary=completion.reasoning_summary,
             runtime_seconds=completion.runtime_seconds,
             input_prompt_characters=completion.input_prompt_characters,
@@ -219,6 +219,16 @@ class ReasoningReportHandler:
         if not answer:
             return "not recorded"
         return json.dumps(answer, ensure_ascii=False)
+
+    @staticmethod
+    def _structure_actual_answer(answer: str) -> str | dict[str, object]:
+        try:
+            decoded_answer = json.loads(answer)
+        except json.JSONDecodeError:
+            return answer
+        if not isinstance(decoded_answer, list):
+            return answer
+        return {"answer": decoded_answer}
 
     def _write_report_file(self, stem: str, extension: str, content: str) -> None:
         latest_report_path = self._report_directory / f"{stem}.{extension}"
