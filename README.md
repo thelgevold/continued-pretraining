@@ -6,6 +6,8 @@ https://www.teachmecoolstuff.com/viewarticle/comparing-rag-and-continued-pretrai
 
 https://www.teachmecoolstuff.com/viewarticle/combining-rag-with-continued-pretraining-of-llms
 
+https://www.teachmecoolstuff.com/viewarticle/creating-evals-to-validate-llm-training
+
 # Awesomeville city training
 
 `city_training` is the sole supported experiment. Its locked continued-
