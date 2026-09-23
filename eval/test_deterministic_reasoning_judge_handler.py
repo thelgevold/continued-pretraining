@@ -46,7 +46,7 @@ def test_extra_same_line_leg_is_semantically_correct() -> None:
         """[
             {"from_station":"Westgate","to_station":"Central Station","subway_line":"Gold Line"},
             {"from_station":"Central Station","to_station":"University Commons","subway_line":"Blue Line"},
-            {"from_station":"Westgate","to_station":"Central Station","subway_line":"Gold Line"}
+            {"from_station":"University Commons","to_station":"University Commons","subway_line":"Blue Line"}
         ]""",
         CASE,
     )
@@ -54,6 +54,22 @@ def test_extra_same_line_leg_is_semantically_correct() -> None:
     assert result["is_correct"] is True
     assert result["score"] == 100.0
     assert result["match_type"] == "semantic_same_line_match"
+
+
+def test_extra_same_line_detour_is_not_semantically_correct() -> None:
+    result = JUDGE.evaluate_answer(
+        """[
+            {"from_station":"Westgate","to_station":"Central Station","subway_line":"Gold Line"},
+            {"from_station":"Central Station","to_station":"University Commons","subway_line":"Blue Line"},
+            {"from_station":"University Commons","to_station":"Central Station","subway_line":"Blue Line"},
+            {"from_station":"Central Station","to_station":"University Commons","subway_line":"Blue Line"}
+        ]""",
+        CASE,
+    )
+
+    assert result["is_correct"] is False
+    assert result["match_type"] == "partial_match"
+    assert result["score"] == 50.0
 
 
 def test_non_json_answer_fails() -> None:

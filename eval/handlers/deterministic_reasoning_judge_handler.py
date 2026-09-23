@@ -25,10 +25,10 @@ class DeterministicReasoningJudgeHandler:
         extra_legs = self._extra_legs(actual_answer, expected_answer)
         score = self._percentage(
             len(expected_answer.legs) - len(missing_legs),
-            len(expected_answer.legs),
+            max(len(expected_answer.legs), len(actual_answer.legs)),
         )
-        if not missing_legs and self._are_superfluous_same_line_legs(
-            extra_legs,
+        if self._has_only_superfluous_same_line_no_ops(
+            actual_answer,
             expected_answer,
         ):
             return self._success(
@@ -73,14 +73,48 @@ class DeterministicReasoningJudgeHandler:
                 extra_legs.append(actual_leg)
         return extra_legs
 
-    @staticmethod
-    def _are_superfluous_same_line_legs(
-        extra_legs: list[tuple[str, str, str]],
+    def _has_only_superfluous_same_line_no_ops(
+        self,
+        actual_answer: SubwayRouteSchemaAnswer,
         expected_answer: SubwayRouteSchemaAnswer,
     ) -> bool:
-        expected_lines = {leg[2] for leg in expected_answer.legs}
-        return bool(extra_legs) and all(
-            leg[2] in expected_lines for leg in extra_legs
+        expected_index = 0
+        has_extra_leg = False
+        for actual_leg in actual_answer.legs:
+            if (
+                expected_index < len(expected_answer.legs)
+                and actual_leg == expected_answer.legs[expected_index]
+            ):
+                expected_index += 1
+                continue
+            if not self._is_superfluous_same_line_no_op(
+                actual_leg,
+                expected_answer.legs,
+                expected_index,
+            ):
+                return False
+            has_extra_leg = True
+        return has_extra_leg and expected_index == len(expected_answer.legs)
+
+    @staticmethod
+    def _is_superfluous_same_line_no_op(
+        actual_leg: tuple[str, str, str],
+        expected_legs: tuple[tuple[str, str, str], ...],
+        expected_index: int,
+    ) -> bool:
+        origin, destination, line = actual_leg
+        if origin != destination:
+            return False
+        return any(
+            station == origin and expected_line == line
+            for station, expected_line in (
+                (expected_legs[expected_index - 1][1], expected_legs[expected_index - 1][2])
+                if expected_index > 0
+                else ("", ""),
+                (expected_legs[expected_index][0], expected_legs[expected_index][2])
+                if expected_index < len(expected_legs)
+                else ("", ""),
+            )
         )
 
     @staticmethod
