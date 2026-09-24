@@ -35,7 +35,6 @@ $env:SCHEMA_SFT_OUTPUT_DIRECTORY_NAME = "schema_sft"
 $env:OLLAMA_MODEL_NAME = & (Join-Path $PSScriptRoot "resolve-awesomeville-model-name.ps1") `
     -BaseModel $BaseModel `
     -TrainingVariant "schema-sft"
-$env:SUBWAY_RAG_BASE_MODEL = $env:OLLAMA_MODEL_NAME
 
 docker compose stop api ollama
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

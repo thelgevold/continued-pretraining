@@ -90,7 +90,6 @@ function Wait-ApiReady {
 }
 
 $env:OLLAMA_MODEL_NAME = $ModelName
-$env:SUBWAY_RAG_BASE_MODEL = $ModelName
 
 docker compose up -d ollama
 if ($LASTEXITCODE -ne 0) {

@@ -1,9 +1,0 @@
-Awesomeville MetroLink subway network
-
-All transfers between different lines occur at Central Station.
-
-Blue Line, in order: North Terminal, University Commons, Founder's Square, River Market, Central Station, South Gardens.
-
-Green Line, in order: Emerald Hills, Museum District Station, Central Station, Innovation Park, Lake Harmony.
-
-Gold Line, in order: Westgate, Old Mill Station, Central Station, East Harbor, Sunrise Point.
