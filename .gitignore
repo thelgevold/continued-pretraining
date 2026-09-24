@@ -6,6 +6,7 @@ __pycache__/
 # Distribution / packaging
 build/
 dist/
+node_modules/
 *.egg-info/
 .eggs/
 pip-wheel-metadata/
@@ -26,6 +27,7 @@ htmlcov/
 
 # Logs
 *.log
+npm-debug.log*
 
 # Environment files
 .env
@@ -43,3 +45,5 @@ training/outputs/
 Thumbs.db
 eval/reports
 city_announcements/chroma_db/
+
+**/.angular

@@ -1,4 +1,14 @@
 services:
+  ui:
+    build:
+      context: .
+      dockerfile: ui/Dockerfile
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./ui:/app
+      - ui-node-modules:/app/node_modules
+
   api:
     build:
       context: .
@@ -91,3 +101,4 @@ services:
 volumes:
   ollama-data:
   huggingface-cache:
+  ui-node-modules:
